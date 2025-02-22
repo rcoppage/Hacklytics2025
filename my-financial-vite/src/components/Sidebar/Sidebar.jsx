@@ -23,13 +23,13 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 </Link>
             </div>
             <div className="sidebar-item">
-                <Link to="/budget">
+                <Link to="/investment">
                     <FaChartLine className="sidebar-icon" />
                     {isOpen && <span className="sidebar-text">Investments</span>}
                 </Link>
             </div>
             <div className="sidebar-item">
-                <Link to="/budget">
+                <Link to="/planning">
                 <LuNotebookPen className="sidebar-icon" />
                     {isOpen && <span className="sidebar-text">Planning</span>}
                 </Link>
