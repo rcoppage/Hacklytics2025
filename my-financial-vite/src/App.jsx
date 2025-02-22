@@ -8,6 +8,7 @@ import Retirement from './components/Retirement/Retirement';
 import Login from './components/Login/Login';
 import Register from './components/Register/Register';
 import Planning from './components/Planning/Planning';
+import RegisterForm from './components/RegisterForm/RegisterForm';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/investment" element={<Investment />} />
         <Route path="/planning" element={<Planning />} />
         <Route path="/retirement" element={<Retirement />} />
+        <Route path="/registerform" element={<RegisterForm />}/>
       </Routes>
     </div>
   )

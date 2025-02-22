@@ -1,0 +1,15 @@
+.RegisterForm .mainInput{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+.RegisterForm .mainInput .inputLabel{
+    margin-right: 20px;
+}
+
+.RegisterForm .mainInput.nextButtons{
+    display: flex;
+    margin-top: 20px;
+}
+
