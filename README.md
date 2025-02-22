@@ -1,2 +1,2 @@
 # Hacklytics2025
-Project from Hackyltics 2025
+Budget Planning Web App for Hackyltics 2025
