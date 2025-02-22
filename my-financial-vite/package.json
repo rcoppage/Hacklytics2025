@@ -23,11 +23,8 @@
     "postcss": "^8.5.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-<<<<<<< HEAD
-    "react-icons": "^5.5.0",
-=======
     "react-firebase-hooks": "^5.1.1",
->>>>>>> 786143403df4903df993962ec06dadce3259c814
+    "react-icons": "^5.5.0",
     "react-router-dom": "^7.2.0",
     "recharts": "^2.15.1",
     "tailwindcss": "^4.0.8"
