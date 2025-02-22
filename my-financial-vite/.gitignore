@@ -31,3 +31,6 @@ node_modules/
 *.log
 
 ./backend/node_modules
+.env
+.\venv
+
