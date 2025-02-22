@@ -1,7 +1,8 @@
 .planning-container {
-    height: 100vh;
+    min-height: 100vh;
     width: 100vw;
-    background-color: #f8fafc;
+    background-color: #ffffff;
+    position: relative;
 }
 
 .planning-title {
@@ -11,11 +12,12 @@
     color: #1a1a1a;
     background-color: white;
     margin: 0;
+    border-bottom: 1px solid #e5e7eb;
 }
 
 .planning-card {
     background: white;
-    height: calc(100vh - 4.5rem); /* Subtract title height */
+    min-height: calc(100vh - 4.5rem); /* Subtract title height */
     padding: 1.5rem;
 }
 
@@ -49,7 +51,7 @@
     height: 40%;
 }
 
-.input-section {
+.input-section, .contribution-section {
     flex: 1;
     background: #f8fafc;
     padding: 1.5rem;
@@ -57,22 +59,14 @@
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    overflow-y: auto;
+    overflow-x: hidden; /* Prevent horizontal overflow */
 }
 
 .chart-section {
     flex: 1;
     display: flex;
     flex-direction: column;
-}
-
-.contribution-section {
-    flex: 1;
-    background: #f8fafc;
-    padding: 1.5rem;
-    border-radius: 0.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
 }
 
 .radio-group {
@@ -91,6 +85,7 @@
     width: 1.25rem;
     height: 1.25rem;
     cursor: pointer;
+    accent-color: #2563eb;
 }
 
 .radio-option label {
@@ -103,6 +98,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+    width: 100%; /* Ensure input groups take full width */
 }
 
 .input-group label {
@@ -116,14 +112,37 @@
     border: 2px solid #e5e7eb;
     border-radius: 0.5rem;
     font-size: 1.1rem;
-    width: 100%;
+    width: 100%; /* Ensure inputs take full width */
     transition: all 0.2s;
+    background-color: white;
+    color: #1a1a1a; /* Ensure text is black */
+    box-sizing: border-box; /* Include padding and border in the element's total width */
 }
 
 .form-input:focus {
     outline: none;
     border-color: #2563eb;
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.form-input::placeholder {
+    color: #9ca3af;
+}
+
+select.form-input {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1em;
+    padding-right: 2.5rem;
+    cursor: pointer;
+    color: #1a1a1a; /* Ensure text is black */
+    box-sizing: border-box; /* Include padding and border in the element's total width */
+}
+
+select.form-input:hover {
+    border-color: #2563eb;
 }
 
 .chart-container {
@@ -160,4 +179,42 @@
     font-weight: 600;
     color: #1a1a1a;
     margin: 0 0 1rem 0;
+}
+
+.mt-2 {
+    margin-top: 0.5rem;
+}
+
+/* Custom number input styling */
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Scrollbar styling */
+.input-section::-webkit-scrollbar,
+.contribution-section::-webkit-scrollbar {
+    width: 8px;
+}
+
+.input-section::-webkit-scrollbar-track,
+.contribution-section::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+}
+
+.input-section::-webkit-scrollbar-thumb,
+.contribution-section::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+.input-section::-webkit-scrollbar-thumb:hover,
+.contribution-section::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
 }
