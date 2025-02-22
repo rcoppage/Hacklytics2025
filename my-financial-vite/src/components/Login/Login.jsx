@@ -32,7 +32,7 @@ const Login = () => {
     return (
         <Container maxWidth="xs">
             <Box sx={{marginTop: 8, display: 'flex', justifyContent: 'center', alignItems: 'center',flexDirection:'column'}}>
-                <Typography component="h1" variant="h5">
+                <Typography component="h1" variant="h5" color="common.black">
                     Login
                 </Typography>
 
