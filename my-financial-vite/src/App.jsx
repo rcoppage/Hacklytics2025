@@ -7,6 +7,7 @@ import Investment from './components/Investment/Investment';
 import Retirement from './components/Retirement/Retirement';
 import Login from './components/Login/Login';
 import Signup from './components/Signup/Signup';
+import Planning from './components/Planning/Planning';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Link to="/budget">Budget</Link>
         <Link to="/investment">Investment</Link>
         <Link to="/retirement">Retirement</Link>
+        <Link to="/planning">Planning</Link>
       </nav>
 
       <Routes>
@@ -25,6 +27,7 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/budget" element={<Budget />} />
         <Route path="/investment" element={<Investment />} />
+        <Route path="/planning" element={<Planning />} />
         <Route path="/retirement" element={<Retirement />} />
       </Routes>
     </div>
