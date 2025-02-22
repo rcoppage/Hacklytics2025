@@ -1,12 +1,10 @@
 import React from 'react';
 import './Register.css';
 import { Box, Button, Container, TextField, Typography } from '@mui/material';
-import {useCreateUserWithEmailAndPassword} from "react-firebase-hooks/auth";
+import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
 import { auth } from "../../../common/firebase";
 import { useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
-
-
 
 const Register = () => {
     const navigate = useNavigate();
