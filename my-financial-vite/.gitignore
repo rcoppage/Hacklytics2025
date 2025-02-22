@@ -24,3 +24,10 @@ dist-ssr
 *.sw?
 
 *.map
+node_modules/
+.env
+./backend/.env
+.DS_Store
+*.log
+
+./backend/node_modules
