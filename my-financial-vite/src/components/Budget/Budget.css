@@ -1,0 +1,14 @@
+.budget {
+    display: flex;
+    flex-direction: row;
+}
+
+.content.expand {
+    margin-left: 300px;
+    transition: margin-left 0.3s ease;
+}
+
+.content.collapse {
+    margin-left: 140px;
+    transition: margin-left 0.3s ease;
+}
