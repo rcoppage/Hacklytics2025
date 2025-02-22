@@ -25,10 +25,10 @@ const RegisterForm = () => {
                     <TextField></TextField>
                 </div>
                 <div className="inputLabel">
-                    <p style={{color: "black"}}>Rent</p>
+                    <p style={{color: "black"}}>Monthly Rent</p>
                 </div>
                 <div className="textInput">
-                    <TextField></TextField>
+                    <TextField>Monthly Debt Payments</TextField>
                 </div>
                 <div className="nextButtons">
                     <Button variant="contained" onClick={() => skipPressed()}>Skip</Button>
