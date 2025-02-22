@@ -1,0 +1,38 @@
+.navbar .container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: rgb(0, 0, 0);
+    color: white;
+    display: flex;
+    width: 100%;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.navbar .left-side {
+    padding-left: 50px;
+}
+
+.navbar .left-side .title {
+    font-size: 30px;
+}
+
+.navbar .right-side {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-right: 50px;
+}
+
+.navbar .right-side .login-btn {
+    margin-right: 20px;
+    width: 100px;
+    background-color: rgb(91, 107, 108);
+}
+
+.navbar .right-side .signup-btn {
+    margin-left: 20px;
+    width: 100px;
+    background-color: rgb(0, 109, 117);
+}
