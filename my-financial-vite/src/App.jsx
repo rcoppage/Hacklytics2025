@@ -12,15 +12,6 @@ import Planning from './components/Planning/Planning';
 function App() {
   return (
     <div>
-      <nav>
-        <Link to="/login">Login</Link>
-        <Link to="/signup">Sign Up</Link>
-        <Link to="/budget">Budget</Link>
-        <Link to="/investment">Investment</Link>
-        <Link to="/retirement">Retirement</Link>
-        <Link to="/planning">Planning</Link>
-      </nav>
-
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
