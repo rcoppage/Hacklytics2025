@@ -340,7 +340,7 @@ function Budget() {
   return (
     <div className="budget">
       <div>
-        <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
+        <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} labelSelected={1}/>
       </div>
       <div className={`content ${sidebarOpen ? 'expand' : 'collapse'}`}>
         <Card sx={{ mb: 3 }}>

@@ -78,7 +78,7 @@ const GenAI = () => {
     return (
         <div className="genAI">
             <div>
-                <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
+                <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} labelSelected={4}/>
             </div>
             <div className={`content ${sidebarOpen ?   'expand' : 'collapse'}`}>
                 <Box component="form" noValidate sx={{ mt: 1}} onSubmit={handleSubmit}>
