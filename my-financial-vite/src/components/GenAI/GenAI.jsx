@@ -7,7 +7,7 @@ import './GenAI.css'
 
 const GenAI = () => {
     const [sidebarOpen, setSidebarOpen] = useState(true);
-    var response
+    const [response, setResponse] = useState("");
     const toggleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
     };
@@ -28,13 +28,55 @@ const GenAI = () => {
 
         const result = await model.generateContent(prompt);
         console.log(result.response.text());
-        document.getElementById("APIResponse").innerText = result.response.text();
         document.getElementById("APIResponse").style.color = "black";
+        const response2 = formatLines(result.response.text().split("\n"));
+        setResponse(response2)
 
     }
+    const formatLines = (lines) => {
+        return lines.map((line, index) => {
+            let className = '';
+            if (line.substring(0,3) === '## ') {
+                className = 'bold';
+                line = line.replaceAll('#','');
+                return (
+                    <h1 key={index} className={className}>
+                    {line}
+                    </h1>
+                );
+            } else if (line.substring(0,2) === '**') {
+                className = 'italic';
+                line = line.substring(2);
+                line = line.replaceAll('*','');
+                return (
+                    <h2 key={index} className={className}>
+                    {line}
+                    </h2>
+                );
+            } else if (line.substring(0,4) === '* **') {
+                className = 'underline';
+                line = line.substring(3);
+                line = line.replaceAll('*','');
+                return (
+                    <h3 key={index} className={className}>
+                    {line}
+                    </h3>
+                );
+            } else {
+                className = 'normal';
+                line = line.replaceAll('*','');
+            }
+
+            return (
+                <div key={index} className={className}>
+                {line}
+                </div>
+            );
+        });
+      };
 // Budget, Homecooked Meals, Dietary Restrictions, Max time per meal,  
     return (
-        <div>
+        <div className="genAI">
             <div>
                 <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
             </div>
@@ -69,7 +111,7 @@ const GenAI = () => {
                     </div>
                 </Box>
                 <div className="APIResponse" id="APIResponse">
-                    <p style={{color: "black"}}>{response}</p>
+                    <div className="Response">{response}</div>
                 </div>
             </div>
         </div>

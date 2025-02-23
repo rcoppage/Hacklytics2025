@@ -1,7 +1,7 @@
 import React from 'react';
 import './Sidebar.css';
 import { FaHome, FaChartLine, FaArrowLeft } from 'react-icons/fa';
-import { GiHamburgerMenu } from 'react-icons/gi';
+import { GiHamburgerMenu, GiKnifeFork } from 'react-icons/gi';
 import { LuNotebookPen } from "react-icons/lu";
 import { RiMoneyDollarCircleLine } from "react-icons/ri";
 import { useState } from 'react';
@@ -32,6 +32,12 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 <Link to="/planning">
                 <LuNotebookPen className="sidebar-icon" />
                     {isOpen && <span className="sidebar-text">Planning</span>}
+                </Link>
+            </div>
+            <div className="sidebar-item">
+                <Link to="/recipe">
+                <GiKnifeFork className="sidebar-icon" />
+                    {isOpen && <span className="sidebar-text">Meal Prep</span>}
                 </Link>
             </div>
         </div>
