@@ -81,33 +81,44 @@ const GenAI = () => {
                 <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} labelSelected={4}/>
             </div>
             <div className={`content ${sidebarOpen ?   'expand' : 'collapse'}`}>
+                <h1>Meal Planner</h1>
                 <Box component="form" noValidate sx={{ mt: 1}} onSubmit={handleSubmit}>
-                    <div>
-                        <p style={{color: "black"}}>Weekly Budget</p>
-                    </div>
-                    <div className="WeeklybudgetInput">
-                        <TextField name="WeeklyBudgetInput"></TextField>
-                    </div>
-                    <div>
-                        <p style={{color: "black"}}>Number of Homecooked Meals</p>
-                    </div>
-                    <div className="HomecookedMealsInput">
-                        <TextField name="HomecookedMealsInput"></TextField>
-                    </div>
-                    <div>
-                        <p style={{color: "black"}}>Dietary Restrictions</p>
-                    </div>
-                    <div className="DietaryRestrictionsInput">
-                        <TextField name="DietaryRestrictionsInput"></TextField>
-                    </div>
-                    <div>
-                        <p style={{color: "black"}}>Max time to cook meal(minutes)</p>
-                    </div>
-                    <div className="MaxTimePerMeal">
-                        <TextField name="MaxTimePerMealInput"></TextField>
-                    </div>
-                    <div className="GenButton" style={{margin: 20}}>
-                        <Button type="submit" style={{color: "black"}} variant='contained'>Generate GenAI</Button>
+                    <div className="main-container">
+                        <div className="input-container">
+                            <div>
+                                <p style={{color: "black"}}>Weekly Budget</p>
+                            </div>
+                            <div className="WeeklybudgetInput">
+                                <TextField name="WeeklyBudgetInput"></TextField>
+                            </div>
+                        </div>
+                        <div className="input-container">
+                            <div>
+                                <p style={{color: "black"}}>Number of Homecooked Meals</p>
+                            </div>
+                            <div className="HomecookedMealsInput">
+                                <TextField name="HomecookedMealsInput"></TextField>
+                            </div>
+                        </div>
+                        <div className="input-container">
+                            <div>
+                                <p style={{color: "black"}}>Dietary Restrictions</p>
+                            </div>
+                            <div className="DietaryRestrictionsInput">
+                                <TextField name="DietaryRestrictionsInput"></TextField>
+                            </div>
+                        </div>
+                        <div className="input-container last-input">
+                            <div>
+                                <p style={{color: "black"}}>Max time to cook meal (in minutes)</p>
+                            </div>
+                            <div className="MaxTimePerMeal">
+                                <TextField name="MaxTimePerMealInput"></TextField>
+                            </div>
+                        </div>
+                        <div className="GenButton" style={{margin: 20}}>
+                            <button className="gen-btn" type="submit" style={{color: "black"}} variant='contained'>Create Recipes</button>
+                        </div>
                     </div>
                 </Box>
                 <div className="APIResponse" id="APIResponse">

@@ -1,5 +1,19 @@
+.content.expand {
+    margin-left: 300px;
+    transition: margin-left 0.3s ease;
+}
+
+.content.collapse {
+    margin-left: 150px;
+    transition: margin-left 0.3s ease;
+}
+
 .planning-container {
     display: flex;
+    background-color: #f0f0f0;
+}
+
+.planning-container .content.expand {
     background-color: #f0f0f0;
 }
 

@@ -2,6 +2,8 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Navbar.css';
 
+import Logo from '../../images/logo.png';
+
 const Navbar = () => {
     const navigate = useNavigate()
     const HomeButton = () =>{
@@ -11,7 +13,9 @@ const Navbar = () => {
         <div className="navbar">
             <div className="container">
                 <div className="left-side">
-                    <button className="title" onClick={() => HomeButton()}>Budgetly</button>
+                    <button className="title" onClick={() => HomeButton()}>
+                        <img className="logo-navbar" src={Logo}></img>
+                    </button>
                 </div>
                 <div className="right-side">
                     <Link to="/login">

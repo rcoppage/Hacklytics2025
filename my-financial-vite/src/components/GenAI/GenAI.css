@@ -1,24 +1,60 @@
 .content.expand {
-    margin-left: 300px;
+    margin-left: 240px;
     transition: margin-left 0.3s ease;
 }
 
 .content.collapse {
-    margin-left: 140px;
+    margin-left: 100px;
     transition: margin-left 0.3s ease;
 }
 
 .content {
     display: flex;
-    justify-content: center;
     flex-direction: column;
     align-items: center;
 }
 
 .genAI {
-    background-color: rgb(230, 228, 228);
+    background-color: #F0F0F0;
     min-height: 100vh;
     height: 100%;
+}
+
+.genAI h1 {
+    display: flex;
+    color: black;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin-top: 50px;
+}
+
+.genAI .main-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.genAI .input-container {
+    background-color: #f8fafc;
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-bottom: 20px;
+    border-radius: 10px;
+    margin: 10px;
+    transition: width 0.3s ease;
+}
+
+.genAI .last-input {
+    margin-right: 30px;
+    transition: width 0.3s ease;
+}
+
+.genAI .content.collapse .input-container {
+    background-color: #f8fafc;
+    border-radius: 10px;
+    transition: width 0.3s ease;
 }
 
 .bold {
@@ -34,3 +70,18 @@
 .underline{
     font-style: underline;
 }   
+
+.genAI .GenButton {
+    display: flex;
+    justify-content: center;
+    margin-top: 200px;
+}
+
+.GenButton .gen-btn {
+    background-color: rgb(170, 170, 170);
+    font-size: 20px;
+}
+
+.genAi .Response {
+    background-color: green;
+}

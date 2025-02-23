@@ -343,6 +343,8 @@ function Budget() {
         <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} labelSelected={1}/>
       </div>
       <div className={`content ${sidebarOpen ? 'expand' : 'collapse'}`}>
+        <h1>Budget Planner</h1>
+        <div className="full-content">
         <Card sx={{ mb: 3 }}>
           <CardContent className="card-content">
             <Typography variant="h6" gutterBottom>
@@ -445,6 +447,7 @@ function Budget() {
             </Box>
           </CardContent>
         </Card>
+        </div>
       </div>
 
       <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)}>
