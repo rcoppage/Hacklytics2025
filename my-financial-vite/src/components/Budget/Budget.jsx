@@ -1,11 +1,13 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Budget.css';
-
 import Sidebar from '../Sidebar/Sidebar';
+import { getAuth } from 'firebase/auth';
 
-import { Box, Card, CardContent, Typography, TextField, Button, 
-   Grid, IconButton, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { 
+  Box, Card, CardContent, Typography, TextField, Button, 
+  Grid, IconButton, Dialog, DialogTitle, DialogContent, DialogActions,
+  CircularProgress, Alert, Snackbar
+} from '@mui/material';
 import { Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
 
@@ -80,6 +82,7 @@ const ExpenseList = ({ title, expenses, onEdit, onDelete, onAdd }) => (
 );
 
 function Budget() {
+  // States
   const [tabValue, setTabValue] = useState(0);
   const [annualSalary, setAnnualSalary] = useState('');
   const [budget, setBudget] = useState({ fixed: [], variable: [], allocation: [] });
@@ -91,20 +94,154 @@ function Budget() {
   const [addCategory, setAddCategory] = useState('');
   const [addName, setAddName] = useState('');
   const [addAmount, setAddAmount] = useState('');
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  
+  // States for MongoDB data handling
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [userDataFetched, setUserDataFetched] = useState(false);
+  const [message, setMessage] = useState({ text: '', type: 'success', open: false });
 
-  const samplePortfolioData = [
-    { month: 'Jan', stocks: 4000, crypto: 2400, savings: 2400 },
-    { month: 'Feb', stocks: 3000, crypto: 1398, savings: 2800 },
-    { month: 'Mar', stocks: 2000, crypto: 9800, savings: 3200 },
-    { month: 'Apr', stocks: 2780, crypto: 3908, savings: 3600 },
-    { month: 'May', stocks: 1890, crypto: 4800, savings: 3800 },
-    { month: 'Jun', stocks: 2390, crypto: 3800, savings: 4000 },
-  ];
+  const saveBudgetToMongo = async (newBudget) => {
+    try {
+      const auth = getAuth();
+      const user = auth.currentUser;
+      
+      if (!user) {
+        setMessage({
+          text: 'Please log in to save your budget',
+          type: 'error',
+          open: true
+        });
+        return;
+      }
 
-  const handleGenerateBudget = () => {
+      const response = await fetch('http://localhost:5000/update-budget', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userId: user.uid,
+          budget: newBudget
+        })
+      });
+
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to save budget');
+      }
+
+      setMessage({
+        text: 'Budget saved successfully',
+        type: 'success',
+        open: true
+      });
+    } catch (error) {
+      console.error('Error saving budget:', error);
+      setMessage({
+        text: 'Failed to save budget',
+        type: 'error',
+        open: true
+      });
+    }
+  };
+
+  const fetchUserData = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const auth = getAuth();
+      const user = auth.currentUser;
+      
+      if (!user) {
+        console.log('No user logged in');
+        setIsLoading(false);
+        return;
+      }
+
+      const response = await fetch(`http://localhost:5000/get-financial-data/${user.uid}`);
+      const data = await response.json();
+
+      if (data.success && data.data) {
+        const { financialInfo, budgetInfo } = data.data;
+        
+        // Add this debug log
+        console.log('Financial Info received:', financialInfo);
+        
+        // Set annual salary
+        if (financialInfo?.salary) {
+          setAnnualSalary(financialInfo.salary.toString());
+        }
+        
+        // If we have existing budget data, use it directly
+        if (budgetInfo && Object.keys(budgetInfo).length > 0) {
+          setBudget(budgetInfo);
+        } else if (financialInfo?.salary) {
+          // Only generate new budget if we don't have saved budget data
+          const monthlyIncome = Math.round(financialInfo.salary / 12);
+          const initialBudget = generateBudget(monthlyIncome);
+          
+          // Update fixed expenses with actual values from MongoDB
+          const updatedFixed = initialBudget.fixed.map(expense => {
+            switch(expense.name) {
+              case 'Rent/Mortgage':
+                return { ...expense, amount: financialInfo.monthlyRent || expense.amount };
+              case 'Groceries':
+                return { ...expense, amount: financialInfo.grocerySpending || expense.amount };
+              case 'Transportation':
+                return { ...expense, amount: financialInfo.transportationCost || expense.amount };
+              case 'Insurance':
+                return { ...expense, amount: financialInfo.insuranceCost || expense.amount };
+              default:
+                return expense;
+            }
+          });
+
+          const newBudget = {
+            ...initialBudget,
+            fixed: updatedFixed
+          };
+          setBudget(newBudget);
+          // Save this initial budget to MongoDB
+          await saveBudgetToMongo(newBudget);
+        }
+        
+        setUserDataFetched(true);
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      setError('Failed to fetch user data');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Add auth state change listener
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        fetchUserData();
+      } else {
+        // Reset states when user logs out
+        setBudget({ fixed: [], variable: [], allocation: [] });
+        setAnnualSalary('');
+        setUserDataFetched(false);
+      }
+    });
+
+    // Cleanup subscription
+    return () => unsubscribe();
+  }, []);
+
+  const handleGenerateBudget = async () => {
     if (!annualSalary) return;
     const monthlyIncome = Math.round(Number(annualSalary) / 12);
-    setBudget(generateBudget(monthlyIncome));
+    const newBudget = generateBudget(monthlyIncome);
+    setBudget(newBudget);
+    await saveBudgetToMongo(newBudget);
   };
 
   const handleEditExpense = (expense) => {
@@ -114,7 +251,7 @@ function Budget() {
     setEditDialogOpen(true);
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (!editingExpense) return;
     
     const updatedBudget = { ...budget };
@@ -129,13 +266,14 @@ function Budget() {
           : exp
       );
       setBudget(updatedBudget);
+      await saveBudgetToMongo(updatedBudget);
     }
     
     setEditDialogOpen(false);
     setEditingExpense(null);
   };
 
-  const handleDeleteExpense = (expenseToDelete) => {
+  const handleDeleteExpense = async (expenseToDelete) => {
     const updatedBudget = { ...budget };
     Object.keys(updatedBudget).forEach(category => {
       updatedBudget[category] = updatedBudget[category].filter(
@@ -143,6 +281,7 @@ function Budget() {
       );
     });
     setBudget(updatedBudget);
+    await saveBudgetToMongo(updatedBudget);
   };
 
   const handleAddItem = (category) => {
@@ -150,7 +289,7 @@ function Budget() {
     setAddDialogOpen(true);
   };
 
-  const handleSaveNewItem = () => {
+  const handleSaveNewItem = async () => {
     if (!addName || !addAmount) return;
 
     const newItem = {
@@ -162,6 +301,7 @@ function Budget() {
     const updatedBudget = { ...budget };
     updatedBudget[addCategory] = [...updatedBudget[addCategory], newItem];
     setBudget(updatedBudget);
+    await saveBudgetToMongo(updatedBudget);
 
     setAddDialogOpen(false);
     setAddName('');
@@ -183,17 +323,32 @@ function Budget() {
     }
   ];
 
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
+
+  if (isLoading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <Alert severity="error">{error}</Alert>
+      </Box>
+    );
+  }
 
   return (
     <div className="budget">
       <div>
         <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
       </div>
-      <div className={`content ${sidebarOpen ?   'expand' : 'collapse'}`}>
+      <div className={`content ${sidebarOpen ? 'expand' : 'collapse'}`}>
         <Card sx={{ mb: 3 }}>
           <CardContent>
             <Typography variant="h6" gutterBottom>
@@ -306,7 +461,7 @@ function Budget() {
             value={editName}
             onChange={(e) => setEditName(e.target.value)}
             fullWidth
-            sx={{ mb: 2 }}
+            sx={{ mb: 2, mt: 2 }}
           />
           <TextField
             label="Amount"
@@ -318,7 +473,7 @@ function Budget() {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
-          <Button onClick={handleSaveEdit}>Save</Button>
+          <Button onClick={handleSaveEdit} variant="contained">Save</Button>
         </DialogActions>
       </Dialog>
 
@@ -330,7 +485,7 @@ function Budget() {
             value={addName}
             onChange={(e) => setAddName(e.target.value)}
             fullWidth
-            sx={{ mb: 2 }}
+            sx={{ mb: 2, mt: 2 }}
           />
           <TextField
             label="Amount"
@@ -342,9 +497,19 @@ function Budget() {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setAddDialogOpen(false)}>Cancel</Button>
-          <Button onClick={handleSaveNewItem}>Save</Button>
+          <Button onClick={handleSaveNewItem} variant="contained">Save</Button>
         </DialogActions>
       </Dialog>
+
+      <Snackbar 
+        open={message.open} 
+        autoHideDuration={6000} 
+        onClose={() => setMessage(prev => ({ ...prev, open: false }))}
+      >
+        <Alert severity={message.type} sx={{ width: '100%' }}>
+          {message.text}
+        </Alert>
+      </Snackbar>
     </div>
   );
 }
