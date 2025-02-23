@@ -78,94 +78,107 @@ const RegisterForm = () => {
     return (
         <div className="RegisterForm">
             <Navbar />
-            <div className="mainInput">
-                <div className="inputLabel">
-                    <p style={{color: "black"}}>Salary</p>
+            <h1>Enter Information</h1>
+            <div className="inputContainer">
+                <div className="mainInput">
+                    <div className="inputSection">
+                        <div className="inputLabel">
+                            <p>Salary</p>
+                        </div>
+                    <div className="textInput">
+                        <TextField 
+                            type="number"
+                            value={formData.salary}
+                            onChange={(e) => handleInputChange(e, 'salary')}
+                            placeholder="Enter your salary"
+                            disabled={loading}
+                        />
+                    </div>
                 </div>
-                <div className="textInput">
-                    <TextField 
-                        type="number"
-                        value={formData.salary}
-                        onChange={(e) => handleInputChange(e, 'salary')}
-                        placeholder="Enter your salary"
-                        disabled={loading}
-                    />
+                <div className="inputSection">
+                    <div className="inputLabel">
+                        <p>Monthly Rent</p>
+                    </div>
+                    <div className="textInput">
+                        <TextField 
+                            type="number"
+                            value={formData.monthlyRent}
+                            onChange={(e) => handleInputChange(e, 'monthlyRent')}
+                            placeholder="Enter monthly rent"
+                            disabled={loading}
+                        />
+                    </div>
                 </div>
-                <div className="inputLabel">
-                    <p style={{color: "black"}}>Monthly Rent</p>
+                <div className="inputSection">
+                    <div className="inputLabel">
+                        <p>Monthly Grocery Spending</p>
+                    </div>
+                    <div className="textInput">
+                        <TextField 
+                            type="number"
+                            value={formData.grocerySpending}
+                            onChange={(e) => handleInputChange(e, 'grocerySpending')}
+                            placeholder="Enter spending"
+                            disabled={loading}
+                        />
+                    </div>
                 </div>
-                <div className="textInput">
-                    <TextField 
-                        type="number"
-                        value={formData.monthlyRent}
-                        onChange={(e) => handleInputChange(e, 'monthlyRent')}
-                        placeholder="Enter monthly rent"
-                        disabled={loading}
-                    />
+                <div className="inputSection">
+                    <div className="inputLabel">
+                        <p>Monthly Transportation Cost</p>
+                    </div>
+                    <div className="textInput">
+                        <TextField 
+                            type="number"
+                            value={formData.transportationCost}
+                            onChange={(e) => handleInputChange(e, 'transportationCost')}
+                            placeholder="Enter spending"
+                            disabled={loading}
+                        />
+                    </div>
                 </div>
-                <div className="inputLabel">
-                    <p style={{color: "black"}}>Monthly Grocery Spending</p>
-                </div>
-                <div className="textInput">
-                    <TextField 
-                        type="number"
-                        value={formData.grocerySpending}
-                        onChange={(e) => handleInputChange(e, 'grocerySpending')}
-                        placeholder="Enter spending"
-                        disabled={loading}
-                    />
-                </div>
-                <div className="inputLabel">
-                    <p style={{color: "black"}}>Monthly Transportation Cost</p>
-                </div>
-                <div className="textInput">
-                    <TextField 
-                        type="number"
-                        value={formData.transportationCost}
-                        onChange={(e) => handleInputChange(e, 'transportationCost')}
-                        placeholder="Enter spending"
-                        disabled={loading}
-                    />
-                </div>
-                <div className="inputLabel">
-                    <p style={{color: "black"}}>Monthly Insurance Cost</p>
-                </div>
-                <div className="textInput">
-                    <TextField 
-                        type="number"
-                        value={formData.insuranceCost}
-                        onChange={(e) => handleInputChange(e, 'insuranceCost')}
-                        placeholder="Enter cost"
-                        disabled={loading}
-                    />
-                </div>
-                <div className="nextButtons">
-                    <Button 
-                        variant="contained" 
-                        onClick={skipPressed} 
-                        disabled={loading}
-                    >
-                        Skip
-                    </Button>
-                    <Button 
-                        variant="contained" 
-                        onClick={nextPressed}
-                        disabled={loading}
-                    >
-                        {loading ? 'Saving...' : 'Next'}
-                    </Button>
+                <div className="inputSection">
+                    <div className="inputLabel">
+                        <p>Monthly Insurance Cost</p>
+                    </div>
+                    <div className="textInput">
+                        <TextField 
+                            type="number"
+                            value={formData.insuranceCost}
+                            onChange={(e) => handleInputChange(e, 'insuranceCost')}
+                            placeholder="Enter cost"
+                            disabled={loading}
+                        />
+                    </div>
                 </div>
             </div>
-            <Snackbar 
-                open={message.open} 
-                autoHideDuration={6000} 
-                onClose={() => setMessage(prev => ({ ...prev, open: false }))}
-            >
-                <Alert severity={message.type} sx={{ width: '100%' }}>
-                    {message.text}
-                </Alert>
-            </Snackbar>
+            <div className="nextButtons">
+                <button 
+                    className="skip-btn"
+                    onClick={skipPressed} 
+                    disabled={loading}
+                >
+                    Skip
+                </button>
+                <button 
+                    className="next-btn"
+                    onClick={nextPressed}
+                    disabled={loading}
+                >
+                    {loading ? 'Saving...' : 'Next'}
+                </button>
+            </div>
         </div>
+        <Snackbar 
+            open={message.open} 
+            autoHideDuration={6000} 
+            onClose={() => setMessage(prev => ({ ...prev, open: false }))}
+        >
+            <Alert severity={message.type} sx={{ width: '100%' }}>
+                {message.text}
+            </Alert>
+        </Snackbar>
+    </div>
     );
 };
 
