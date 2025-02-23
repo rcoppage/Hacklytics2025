@@ -20,7 +20,7 @@ const Register = () => {
 
     useEffect(()=>{
         if (user) {
-            navigate("/budget");
+            navigate("/RegisterForm");
         }
     }, [user, navigate]);
 
