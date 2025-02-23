@@ -1,19 +1,29 @@
 import express from 'express';
 import { MongoClient } from 'mongodb';
 import cors from 'cors';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const uri = "mongodb+srv://reececoppage:CZmdYV91jpRWgUlf@financial.oqy1f.mongodb.net/?retryWrites=true&w=majority&appName=Financial";
+// Add error handling for missing environment variables
+if (!process.env.MONGODB_URI) {
+  console.error('MONGODB_URI is not defined in environment variables');
+  process.exit(1);
+}
+
+const uri = process.env.MONGODB_URI;
 const client = new MongoClient(uri);
 
 async function connectToMongo() {
   try {
     await client.connect();
     console.log('Connected to MongoDB');
-    return client.db('UserFinance');  // Database
+    return client.db('UserFinance');
   } catch (error) {
     console.error('MongoDB connection error:', error);
     throw error;
