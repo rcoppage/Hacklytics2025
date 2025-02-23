@@ -1,7 +1,7 @@
 import "./RegisterForm.css"
-import { Box, Button, Container, TextField, Typography, Snackbar, Alert } from '@mui/material';
+import { Box, Button, Container, TextField, Typography, Snackbar, Alert, CircularProgress } from '@mui/material';
 import Navbar from "../Navbar/Navbar";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { getAuth } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 
@@ -17,11 +17,31 @@ const RegisterForm = () => {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState({ text: '', type: 'success', open: false });
 
-    const handleInputChange = (e, field) => {
-        setFormData({
-            ...formData,
-            [field]: e.target.value
+    useEffect(() => {
+        // Check if user is authenticated
+        const auth = getAuth();
+        const unsubscribe = auth.onAuthStateChanged(user => {
+            if (!user) {
+                setMessage({
+                    text: 'Please log in first',
+                    type: 'error',
+                    open: true
+                });
+                navigate('/login');
+            }
         });
+
+        return () => unsubscribe();
+    }, [navigate]);
+
+    const handleInputChange = (e, field) => {
+        const value = e.target.value;
+        if (value === '' || value >= 0) {  // Allow empty or non-negative numbers
+            setFormData({
+                ...formData,
+                [field]: value
+            });
+        }
     };
 
     const skipPressed = () => {
@@ -29,6 +49,22 @@ const RegisterForm = () => {
     };
 
     const nextPressed = async () => {
+        // Validate inputs
+        const numericFields = ['salary', 'monthlyRent', 'grocerySpending', 'transportationCost', 'insuranceCost'];
+        const hasInvalidFields = numericFields.some(field => {
+            const value = Number(formData[field]);
+            return formData[field] !== '' && (isNaN(value) || value < 0);
+        });
+
+        if (hasInvalidFields) {
+            setMessage({
+                text: 'Please enter valid non-negative numbers',
+                type: 'error',
+                open: true
+            });
+            return;
+        }
+
         setLoading(true);
         try {
             const auth = getAuth();
@@ -63,10 +99,12 @@ const RegisterForm = () => {
                     open: true
                 });
                 navigate('/Budget'); 
+            } else {
+                throw new Error(data.error || 'Failed to save data');
             }
         } catch (error) {
             setMessage({
-                text: 'Error saving data. Please try again.',
+                text: error.message || 'Error saving data. Please try again.',
                 type: 'error',
                 open: true
             });
