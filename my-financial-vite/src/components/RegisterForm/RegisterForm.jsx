@@ -137,8 +137,19 @@ const RegisterForm = () => {
                         fullWidth
                     />
                 </div>
-                <div className="inputLabel">
-                    <p style={{color: "black"}}>Monthly Rent</p>
+                <div className="inputSection">
+                    <div className="inputLabel">
+                        <p>Monthly Grocery Spending</p>
+                    </div>
+                    <div className="textInput">
+                        <TextField 
+                            type="number"
+                            value={formData.grocerySpending}
+                            onChange={(e) => handleInputChange(e, 'grocerySpending')}
+                            placeholder="Enter spending"
+                            disabled={loading}
+                        />
+                    </div>
                 </div>
                 <div className="textInput">
                     <TextField 
@@ -210,16 +221,33 @@ const RegisterForm = () => {
                     </Button>
                 </div>
             </div>
-            <Snackbar 
-                open={message.open} 
-                autoHideDuration={6000} 
-                onClose={() => setMessage(prev => ({ ...prev, open: false }))}
-            >
-                <Alert severity={message.type} sx={{ width: '100%' }}>
-                    {message.text}
-                </Alert>
-            </Snackbar>
+            <div className="nextButtons">
+                <button 
+                    className="skip-btn"
+                    onClick={skipPressed} 
+                    disabled={loading}
+                >
+                    Skip
+                </button>
+                <button 
+                    className="next-btn"
+                    onClick={nextPressed}
+                    disabled={loading}
+                >
+                    {loading ? 'Saving...' : 'Next'}
+                </button>
+            </div>
         </div>
+        <Snackbar 
+            open={message.open} 
+            autoHideDuration={6000} 
+            onClose={() => setMessage(prev => ({ ...prev, open: false }))}
+        >
+            <Alert severity={message.type} sx={{ width: '100%' }}>
+                {message.text}
+            </Alert>
+        </Snackbar>
+    </div>
     );
 };
 
