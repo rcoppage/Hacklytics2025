@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Navbar.css';
-import { Button } from '@mui/material';
 
 const Navbar = () => {
     const navigate = useNavigate()
@@ -12,7 +11,7 @@ const Navbar = () => {
         <div className="navbar">
             <div className="container">
                 <div className="left-side">
-                    <Button className="title" variant="text" style={{color: "white"}} onClick={() => HomeButton()}>My Financial</Button>
+                    <button className="title" onClick={() => HomeButton()}>Budgetly</button>
                 </div>
                 <div className="right-side">
                     <Link to="/login">
