@@ -1,25 +1,30 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './Navbar.css';
+import { Button } from '@mui/material';
 
 const Navbar = () => {
-  return (
-    <div className="navbar">
-        <div className="container">
-            <div className="left-side">
-                <h1 className="title">My Financial</h1>
-            </div>
-            <div className="right-side">
-                <Link to="/login">
-                    <button className="login-btn">Login</button>
-                </Link>
-                <Link to="/register">
-                    <button className="signup-btn">Register</button>
-                </Link>
+    const navigate = useNavigate()
+    const HomeButton = () =>{
+        navigate("/")
+    }
+    return (
+        <div className="navbar">
+            <div className="container">
+                <div className="left-side">
+                    <Button className="title" variant="text" style={{color: "white"}} onClick={() => HomeButton()}>My Financial</Button>
+                </div>
+                <div className="right-side">
+                    <Link to="/login">
+                        <button className="login-btn">Login</button>
+                    </Link>
+                    <Link to="/register">
+                        <button className="signup-btn">Register</button>
+                    </Link>
+                </div>
             </div>
         </div>
-    </div>
-  )
+    )
 }
 
 export default Navbar

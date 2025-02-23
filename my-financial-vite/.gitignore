@@ -25,4 +25,11 @@ dist-ssr
 
 *.map
 .env
+./backend/.env
+.DS_Store
+*.log
+
+./backend/node_modules
+.env
 .\venv
+
