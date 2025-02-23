@@ -1,0 +1,27 @@
+.currency-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap; /* Ensures responsiveness */
+  }
+  
+  .currency-card {
+    border: 1px solid #ddd;
+    padding: 15px;
+    width: 30%;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    background-color: #f9f9f9;
+  }
+  
+  .currency-card h2 {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+  }
+  
+  .currency-card p {
+    font-size: 1em;
+    margin: 5px 0;
+  }
+  

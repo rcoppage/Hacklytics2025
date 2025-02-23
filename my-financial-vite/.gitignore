@@ -32,4 +32,5 @@ dist-ssr
 ./backend/node_modules
 .env
 .\venv
+../env
 

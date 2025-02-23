@@ -14,7 +14,7 @@ const BondMarketData = () => {
 
   // Fetch 2-year Treasury data
   useEffect(() => {
-    fetch('https://api.stlouisfed.org/fred/series/observations?series_id=DGS2&api_key=YOUR_FRED_API_KEY&file_type=json')
+    fetch('https://cors-anywhere.herokuapp.com/https://api.stlouisfed.org/fred/series/observations?series_id=DGS2&api_key=e4cc6320f97f206a3ad166fbdab00b81&file_type=json')
       .then(response => response.json())
       .then(data => {
         const latestData = data.observations[data.observations.length - 1];
@@ -26,7 +26,7 @@ const BondMarketData = () => {
 
   // Fetch 5-year Treasury data
   useEffect(() => {
-    fetch('https://api.stlouisfed.org/fred/series/observations?series_id=DGS5&api_key=YOUR_FRED_API_KEY&file_type=json')
+    fetch('https://cors-anywhere.herokuapp.com/https://api.stlouisfed.org/fred/series/observations?series_id=DGS5&api_key=e4cc6320f97f206a3ad166fbdab00b81&file_type=json')
       .then(response => response.json())
       .then(data => {
         const latestData = data.observations[data.observations.length - 1];
@@ -38,7 +38,7 @@ const BondMarketData = () => {
 
   // Fetch 10-year Treasury data
   useEffect(() => {
-    fetch('https://api.stlouisfed.org/fred/series/observations?series_id=DGS10&api_key=YOUR_FRED_API_KEY&file_type=json')
+    fetch('https://cors-anywhere.herokuapp.com/https://api.stlouisfed.org/fred/series/observations?series_id=DGS10&api_key=YOUR_FRED_API_KEY&file_type=json')
       .then(response => response.json())
       .then(data => {
         const latestData = data.observations[data.observations.length - 1];

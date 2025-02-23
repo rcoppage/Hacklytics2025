@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask import make_response
 import pandas as pd
 from stable_baselines3 import PPO
 import numpy as np
@@ -9,34 +10,30 @@ import torch
 import zipfile
 import os
 from fredapi import Fred  # Use FRED API
+from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
+# Enable CORS for all routes (this will allow all origins)
+
+# Enable CORS for all routes (for development, if desired)
+CORS(app, resources={r"/*": {"origins": "*"}})  # Allow all origins for all routes
 
 # --- Configurations ---
 API_KEY_FRED = 'e4cc6320f97f206a3ad166fbdab00b81 '  # Replace with your actual FRED API key
 FRED_BASE_URL = 'https://api.stlouisfed.org/fred/series/observations'
-MODELS_DIR = 'C:\\Users\\ac0119\\PycharmProjects\\YOLOV92'  # Adjust this if your models are in a different directory
+MODELS_DIR = './Models'  # Adjust this if your models are in a different directory
 
 # --- Bond Trading ---
 
 # Load the trained models for different bond types
 class BondTradingRL:
     def __init__(self):
-        model_2year_path = os.path.join(MODELS_DIR, "bond_rl_trader2year.zip")
-        model_5year_path = os.path.join(MODELS_DIR, "bond_rl_trader5year.zip")
-        model_10year_path = os.path.join(MODELS_DIR, "bond_rl_trader.zip")
-        # Ensure files exist before loading
-        if not os.path.exists(model_2year_path):
-            raise FileNotFoundError(f"Model file not found: {model_2year_path}")
-        if not os.path.exists(model_5year_path):
-            raise FileNotFoundError(f"Model file not found: {model_5year_path}")
-        if not os.path.exists(model_10year_path):
-            raise FileNotFoundError(f"Model file not found: {model_10year_path}")
+    
 
         # Load separate models for 2-year, 5-year, and 10-year bonds
-        self.model_2year = PPO.load(model_2year_path)
-        self.model_5year = PPO.load(model_5year_path)
-        self.model_10year = PPO.load(model_10year_path)
+        self.model_2year = PPO.load("./Models/bond_rl_trader2yearnumpyold.zip")
+        self.model_10year = PPO.load("./Models/bond_rl_trader10yearnumpyold.zip")
+        self.model_5year = PPO.load("./Models/bond_rl_trader5yearnumpyold.zip")
 
     def predict(self, bond_type, data):
         # Create a DataFrame from the data sent from React
@@ -68,11 +65,11 @@ bond_trader = BondTradingRL()
 # Load pretrained models from.zip files
 def load_model(currency_pair):
     if currency_pair == 'EUR_USD':
-        model_path = os.path.join(MODELS_DIR, 'eur_usd_rl_trader.zip')
+        model_path = ".//Models//usd_eur_rl_traderoldnumpy.zip"
     elif currency_pair == 'JPY_USD':
-        model_path = os.path.join(MODELS_DIR, 'jpy_usd_rl_trader.zip')
+        model_path = ".//Models//usd_jpy_rl_traderoldnumpy.zip"
     elif currency_pair == 'AUD_USD':
-        model_path = os.path.join(MODELS_DIR, 'aud_usd_rl_trader.zip')
+        model_path = ".//Models//aud_usd_rl_traderoldnumpy.zip"
     else:
         raise ValueError('Invalid currency pair for model loading')
 
@@ -126,8 +123,8 @@ class StockMarketTradingRL:
         self.sp500_env = StockMarketTradingEnv('SP500', api_key)
 
         # Initialize RL Models for both markets, loading from the specified paths
-        self.nasdaq_model = PPO.load(os.path.join(MODELS_DIR, "nasdaq_rl_trader.zip"))
-        self.sp500_model = PPO.load(os.path.join(MODELS_DIR, "sp500_rl_trader.zip"))
+        self.nasdaq_model = PPO.load(".//Models//nasdaq_rl_traderoldnumpy.zip")
+        self.sp500_model = PPO.load(".//Models//sp500_rl_traderoldnumpy.zip")
 
     def train_model(self, market_type, timesteps=50000):
         """Train the RL model for the selected market type."""
@@ -219,12 +216,20 @@ class StockMarketTradingEnv(gym.Env):
         print(f"Step: {self.current_step}, Cash: {self.cash_balance}, Shares Owned: {self.shares_owned}")
 
 # Initialize the stock trading RL agent
-stock_trading_rl = StockMarketTradingRL(api_key=API_KEY_FRED)
+stock_trading_rl = StockMarketTradingRL(api_key="e4cc6320f97f206a3ad166fbdab00b81")
 
 # --- Flask Routes ---
 
-@app.route("/predict_bond", methods=["POST"])
+@app.route("/predict_bond", methods=["POST", "OPTIONS"])
+
 def predict_bond():
+    if request.method == "OPTIONS":
+        # This handles the preflight request
+        response = make_response()
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+        return response
     # Get data from the request
     data = request.json
     bond_type = data.get("bond_type")  # Get bond type (e.g., 'twoYear', 'fiveYear', 'tenYear')
@@ -251,8 +256,48 @@ def get_exchange_data():
     else:
         return jsonify({'error': 'Unable to fetch data for the requested currency pair'}), 500
 
-@app.route('/predict_exchange', methods=['POST'])
+@app.route('/predict_exchange', methods=['POST', 'OPTIONS'])
+
 def predict_exchange():
+    if request.method == "OPTIONS":
+        # Handle preflight request
+        response = make_response()
+        response.headers['Access-Control-Allow-Origin'] = '*'  # Allow all origins (or specify your frontend origin)
+        response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'  # Allow POST and OPTIONS
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type'  # Allow Content-Type header
+        return response
+
+    # Handle the actual POST request
+    try:
+        data = request.get_json()
+        currency_pair = data['currencyPair']
+
+        # Load the correct model based on currency pair
+        model = load_model(currency_pair)
+
+        # Prepare the observation (for simplicity, using exchangeRate and cash_balance as observation)
+        cash_balance = data['cash_balance']
+        currency_owned = data['currency_owned']
+        price = data['price']
+
+        # Create a mock observation (Replace this with your actual observation format)
+        observation = [cash_balance, currency_owned, price]
+
+        # Predict the action using the model
+        action, _ = model.predict(observation)
+
+        # Map the action to a human-readable form
+        action_map = {0: "Hold", 1: "Buy", 2: "Sell"}
+        action_str = action_map.get(action, "Unknown")
+
+        response = jsonify({'action': action_str})
+        response.headers['Access-Control-Allow-Origin'] = '*'  # Allow all origins (or specify your frontend origin)
+        return response
+
+    except Exception as e:
+        response = jsonify({'error': str(e)}), 500
+        response.headers['Access-Control-Allow-Origin'] = '*'  # Allow all origins (or specify your frontend origin)
+        return response
     try:
         data = request.get_json()
         currency_pair = data['currencyPair']
@@ -280,8 +325,24 @@ def predict_exchange():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/predict_stock', methods=['POST'])
+@app.route("/predict_stock", methods=["POST", "OPTIONS"])
+
 def predict_stock():
+    if request.method == "OPTIONS":
+        # This handles the preflight request
+        response = make_response()
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+        return response
+
+
+
+    
+    # Your regular POST request handling
+    data = request.get_json()
+    # Your code here
+
     data = request.get_json()
 
     market_type = data.get('market_type', 'nasdaq')  # Default to 'nasdaq'

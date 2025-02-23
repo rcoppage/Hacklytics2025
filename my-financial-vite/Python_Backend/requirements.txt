@@ -1,0 +1,8 @@
+flask
+pandas
+stable-baselines3
+numpy
+gym
+requests
+torch
+fredapi

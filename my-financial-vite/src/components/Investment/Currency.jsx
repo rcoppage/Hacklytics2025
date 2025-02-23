@@ -12,38 +12,78 @@ const CurrencyExchangeData = () => {
     audUsd: null,
   });
 
-  // Fetch EUR/USD data
-  useEffect(() => {
-    fetch('http://localhost:5000/getExchangeData?currency=EUR_USD') // Backend API endpoint for EUR/USD
-      .then(response => response.json())
-      .then(data => {
+  const API_KEY_FRED = '2a894c54f8a4e85b549ff9a69d722528';  // Replace with your actual FRED API key
+const FRED_BASE_URL = 'https://cors-anywhere.herokuapp.com/https://api.stlouisfed.org/fred/series/observations';
+
+const fetchExchangeData = (currency) => {
+  let seriesId;
+
+  // Map currency pair to FRED series ID
+  if (currency === 'EUR_USD') {
+    seriesId = 'DEXUSEU';  // EUR/USD FRED series ID
+  } else if (currency === 'JPY_USD') {
+    seriesId = 'DEXJPUS';  // JPY/USD FRED series ID
+  } else if (currency === 'AUD_USD') {
+    seriesId = 'DEXUSAL';  // AUD/USD FRED series ID
+  } else {
+    console.error('Invalid currency pair');
+    return;
+  }
+
+  const url = `${FRED_BASE_URL}?series_id=${seriesId}&api_key=${API_KEY_FRED}&file_type=json`;
+
+  return fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      const latestData = data.observations[data.observations.length - 1];  // Get the most recent data
+      return {
+        currencyPair: currency,
+        exchangeRate: latestData.value,
+        date: latestData.date,
+      };
+    })
+    .catch(error => {
+      console.error(`Error fetching data for ${currency}:`, error);
+      return null;
+    });
+};
+
+// Fetch EUR/USD data
+useEffect(() => {
+  fetchExchangeData('EUR_USD')
+    .then(data => {
+      if (data) {
         setMarketData(prevData => ({ ...prevData, eurUsd: data }));
         sendMarketDataToModel(data, 'eurUsd');
-      })
-      .catch(error => console.error('Error fetching EUR/USD data:', error));
-  }, []);
+      }
+    })
+    .catch(error => console.error('Error fetching EUR/USD data:', error));
+}, []);
 
-  // Fetch JPY/USD data
-  useEffect(() => {
-    fetch('http://localhost:5000/getExchangeData?currency=JPY_USD') // Backend API endpoint for JPY/USD
-      .then(response => response.json())
-      .then(data => {
+// Fetch JPY/USD data
+useEffect(() => {
+  fetchExchangeData('JPY_USD')
+    .then(data => {
+      if (data) {
         setMarketData(prevData => ({ ...prevData, jpyUsd: data }));
         sendMarketDataToModel(data, 'jpyUsd');
-      })
-      .catch(error => console.error('Error fetching JPY/USD data:', error));
-  }, []);
+      }
+    })
+    .catch(error => console.error('Error fetching JPY/USD data:', error));
+}, []);
 
-  // Fetch AUD/USD data
-  useEffect(() => {
-    fetch('http://localhost:5000/getExchangeData?currency=AUD_USD') // Backend API endpoint for AUD/USD
-      .then(response => response.json())
-      .then(data => {
+// Fetch AUD/USD data
+useEffect(() => {
+  fetchExchangeData('AUD_USD')
+    .then(data => {
+      if (data) {
         setMarketData(prevData => ({ ...prevData, audUsd: data }));
         sendMarketDataToModel(data, 'audUsd');
-      })
-      .catch(error => console.error('Error fetching AUD/USD data:', error));
-  }, []);
+      }
+    })
+    .catch(error => console.error('Error fetching AUD/USD data:', error));
+}, []);
+
 
   const sendMarketDataToModel = (data, currencyPair) => {
     const dataToSend = {
@@ -55,7 +95,7 @@ const CurrencyExchangeData = () => {
     };
 
     // Send the data to the backend for prediction
-    fetch('http://localhost:5000/predict', {
+    fetch('http://localhost:5000/predict_exchange', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(dataToSend),

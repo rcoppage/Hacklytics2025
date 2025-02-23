@@ -1,0 +1,33 @@
+.investment-container {
+    display: flex; /* Use flexbox to arrange items side by side */
+    flex-wrap: wrap; /* Allow items to wrap onto multiple lines if needed */
+    justify-content: space-around; /* Distribute items evenly with space around them */
+    align-items: flex-start; /* Align items to the top of the container */
+    width: 100%; /* Ensure the container takes full width */
+  }
+  
+  .investment-container > div { /* Target direct children of the container */
+    width: 30%; /* Set a width for each component (adjust as needed) */
+    margin: 10px; /* Add some margin for spacing */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    border: 1px solid #ddd; /* Add a light border for visual separation */
+    padding: 15px; /* Add padding inside each component */
+    min-width: 500px; /* Ensure a minimum width to prevent them from becoming too narrow */
+  }
+  
+  /* Optional: If you want to handle smaller screens */
+  @media (max-width: 768px) {
+    .investment-container > div {
+      width: 90%; /* On smaller screens, make them stack vertically */
+    }
+  }
+  
+  /* Optional: Add specific styles for headings, paragraphs, etc. */
+  .investment-container h2 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+  }
+  
+  .investment-container p {
+    line-height: 1.6;
+  }
