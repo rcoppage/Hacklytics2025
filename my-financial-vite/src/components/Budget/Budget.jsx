@@ -1,13 +1,15 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Budget.css';
+import Sidebar from '../Sidebar/Sidebar';
+import { getAuth } from 'firebase/auth';
 
-import { Box, Tabs, Tab, Card, CardContent, Typography, TextField, Button, Dialog, 
-  DialogTitle, DialogContent, DialogActions, Grid, IconButton } from '@mui/material';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, 
-  ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { Edit as EditIcon, Delete as DeleteIcon, ShowChart, CurrencyBitcoin, 
-  Savings, TrendingUp } from '@mui/icons-material';
+import { 
+  Box, Card, CardContent, Typography, TextField, Button, 
+  Grid, IconButton, Dialog, DialogTitle, DialogContent, DialogActions,
+  CircularProgress, Alert, Snackbar
+} from '@mui/material';
+import { Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28'];
 
@@ -40,7 +42,7 @@ const generateBudget = (monthlySalary) => {
   };
 };
 
-const ExpenseList = ({ title, expenses, onEdit, onDelete }) => (
+const ExpenseList = ({ title, expenses, onEdit, onDelete, onAdd }) => (
   <Card sx={{ height: '100%' }}>
     <CardContent>
       <Typography variant="h6" gutterBottom>{title}</Typography>
@@ -67,29 +69,20 @@ const ExpenseList = ({ title, expenses, onEdit, onDelete }) => (
           </Box>
         </Box>
       ))}
-    </CardContent>
-  </Card>
-);
-
-const PortfolioCard = ({ title, value, trend, icon: Icon }) => (
-  <Card>
-    <CardContent>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-        <Typography color="textSecondary">{title}</Typography>
-        <Icon />
-      </Box>
-      <Typography variant="h5">${value.toLocaleString()}</Typography>
-      <Typography 
-        color={trend >= 0 ? 'success.main' : 'error.main'}
-        sx={{ display: 'flex', alignItems: 'center' }}
+      <Button 
+        variant="contained" 
+        startIcon={<AddIcon />} 
+        onClick={onAdd}
+        sx={{ mt: 2 }}
       >
-        {trend >= 0 ? '↑' : '↓'} {Math.abs(trend)}%
-      </Typography>
+        Add New Item
+      </Button>
     </CardContent>
   </Card>
 );
 
 function Budget() {
+  // States
   const [tabValue, setTabValue] = useState(0);
   const [annualSalary, setAnnualSalary] = useState('');
   const [budget, setBudget] = useState({ fixed: [], variable: [], allocation: [] });
@@ -97,24 +90,158 @@ function Budget() {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editName, setEditName] = useState('');
   const [editAmount, setEditAmount] = useState('');
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [addCategory, setAddCategory] = useState('');
+  const [addName, setAddName] = useState('');
+  const [addAmount, setAddAmount] = useState('');
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  
+  // States for MongoDB data handling
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [userDataFetched, setUserDataFetched] = useState(false);
+  const [message, setMessage] = useState({ text: '', type: 'success', open: false });
 
-  const samplePortfolioData = [
-    { month: 'Jan', stocks: 4000, crypto: 2400, savings: 2400 },
-    { month: 'Feb', stocks: 3000, crypto: 1398, savings: 2800 },
-    { month: 'Mar', stocks: 2000, crypto: 9800, savings: 3200 },
-    { month: 'Apr', stocks: 2780, crypto: 3908, savings: 3600 },
-    { month: 'May', stocks: 1890, crypto: 4800, savings: 3800 },
-    { month: 'Jun', stocks: 2390, crypto: 3800, savings: 4000 },
-  ];
+  const saveBudgetToMongo = async (newBudget) => {
+    try {
+      const auth = getAuth();
+      const user = auth.currentUser;
+      
+      if (!user) {
+        setMessage({
+          text: 'Please log in to save your budget',
+          type: 'error',
+          open: true
+        });
+        return;
+      }
 
-  const handleTabChange = (event, newValue) => {
-    setTabValue(newValue);
+      const response = await fetch('http://localhost:5000/update-budget', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userId: user.uid,
+          budget: newBudget
+        })
+      });
+
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to save budget');
+      }
+
+      setMessage({
+        text: 'Budget saved successfully',
+        type: 'success',
+        open: true
+      });
+    } catch (error) {
+      console.error('Error saving budget:', error);
+      setMessage({
+        text: 'Failed to save budget',
+        type: 'error',
+        open: true
+      });
+    }
   };
 
-  const handleGenerateBudget = () => {
+  const fetchUserData = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const auth = getAuth();
+      const user = auth.currentUser;
+      
+      if (!user) {
+        console.log('No user logged in');
+        setIsLoading(false);
+        return;
+      }
+
+      const response = await fetch(`http://localhost:5000/get-financial-data/${user.uid}`);
+      const data = await response.json();
+
+      if (data.success && data.data) {
+        const { financialInfo, budgetInfo } = data.data;
+        
+        // Add this debug log
+        console.log('Financial Info received:', financialInfo);
+        
+        // Set annual salary
+        if (financialInfo?.salary) {
+          setAnnualSalary(financialInfo.salary.toString());
+        }
+        
+        // If we have existing budget data, use it directly
+        if (budgetInfo && Object.keys(budgetInfo).length > 0) {
+          setBudget(budgetInfo);
+        } else if (financialInfo?.salary) {
+          // Only generate new budget if we don't have saved budget data
+          const monthlyIncome = Math.round(financialInfo.salary / 12);
+          const initialBudget = generateBudget(monthlyIncome);
+          
+          // Update fixed expenses with actual values from MongoDB
+          const updatedFixed = initialBudget.fixed.map(expense => {
+            switch(expense.name) {
+              case 'Rent/Mortgage':
+                return { ...expense, amount: financialInfo.monthlyRent || expense.amount };
+              case 'Groceries':
+                return { ...expense, amount: financialInfo.grocerySpending || expense.amount };
+              case 'Transportation':
+                return { ...expense, amount: financialInfo.transportationCost || expense.amount };
+              case 'Insurance':
+                return { ...expense, amount: financialInfo.insuranceCost || expense.amount };
+              default:
+                return expense;
+            }
+          });
+
+          const newBudget = {
+            ...initialBudget,
+            fixed: updatedFixed
+          };
+          setBudget(newBudget);
+          // Save this initial budget to MongoDB
+          await saveBudgetToMongo(newBudget);
+        }
+        
+        setUserDataFetched(true);
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      setError('Failed to fetch user data');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Add auth state change listener
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        fetchUserData();
+      } else {
+        // Reset states when user logs out
+        setBudget({ fixed: [], variable: [], allocation: [] });
+        setAnnualSalary('');
+        setUserDataFetched(false);
+      }
+    });
+
+    // Cleanup subscription
+    return () => unsubscribe();
+  }, []);
+
+  const handleGenerateBudget = async () => {
     if (!annualSalary) return;
     const monthlyIncome = Math.round(Number(annualSalary) / 12);
-    setBudget(generateBudget(monthlyIncome));
+    const newBudget = generateBudget(monthlyIncome);
+    setBudget(newBudget);
+    await saveBudgetToMongo(newBudget);
   };
 
   const handleEditExpense = (expense) => {
@@ -124,7 +251,7 @@ function Budget() {
     setEditDialogOpen(true);
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (!editingExpense) return;
     
     const updatedBudget = { ...budget };
@@ -139,13 +266,14 @@ function Budget() {
           : exp
       );
       setBudget(updatedBudget);
+      await saveBudgetToMongo(updatedBudget);
     }
     
     setEditDialogOpen(false);
     setEditingExpense(null);
   };
 
-  const handleDeleteExpense = (expenseToDelete) => {
+  const handleDeleteExpense = async (expenseToDelete) => {
     const updatedBudget = { ...budget };
     Object.keys(updatedBudget).forEach(category => {
       updatedBudget[category] = updatedBudget[category].filter(
@@ -153,6 +281,31 @@ function Budget() {
       );
     });
     setBudget(updatedBudget);
+    await saveBudgetToMongo(updatedBudget);
+  };
+
+  const handleAddItem = (category) => {
+    setAddCategory(category);
+    setAddDialogOpen(true);
+  };
+
+  const handleSaveNewItem = async () => {
+    if (!addName || !addAmount) return;
+
+    const newItem = {
+      id: `${addCategory}-${Date.now()}`,
+      name: addName,
+      amount: Number(addAmount)
+    };
+
+    const updatedBudget = { ...budget };
+    updatedBudget[addCategory] = [...updatedBudget[addCategory], newItem];
+    setBudget(updatedBudget);
+    await saveBudgetToMongo(updatedBudget);
+
+    setAddDialogOpen(false);
+    setAddName('');
+    setAddAmount('');
   };
 
   const getBudgetData = () => [
@@ -170,266 +323,152 @@ function Budget() {
     }
   ];
 
-  return (
-    <Box sx={{ width: '100%', padding: 3 }}>
-      <Typography variant="h3" gutterBottom>
-        Financial Dashboard
-      </Typography>
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
 
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-        <Tabs value={tabValue} onChange={handleTabChange}>
-          <Tab label="Budget" />
-          <Tab label="Investments" />
-          <Tab label="Retirement" />
-        </Tabs>
+  if (isLoading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <CircularProgress />
       </Box>
+    );
+  }
 
-      {/* Budget Tab */}
-      {tabValue === 0 && (
-        <>
-          <Card sx={{ mb: 3 }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Salary Information
-              </Typography>
-              <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-                <TextField
-                  type="number"
-                  label="Annual Salary"
-                  value={annualSalary}
-                  onChange={(e) => setAnnualSalary(e.target.value)}
-                  fullWidth
-                />
-                <Button 
-                  variant="contained" 
-                  onClick={handleGenerateBudget}
-                  sx={{ minWidth: '200px' }}
-                >
-                  Generate Budget
-                </Button>
-              </Box>
-              {annualSalary && (
-                <Grid container spacing={3}>
-                  <Grid item xs={4}>
-                    <Typography color="textSecondary">Monthly</Typography>
-                    <Typography variant="h6">
-                      ${Math.round(Number(annualSalary) / 12).toLocaleString()}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={4}>
-                    <Typography color="textSecondary">Bi-Weekly</Typography>
-                    <Typography variant="h6">
-                      ${Math.round(Number(annualSalary) / 26).toLocaleString()}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={4}>
-                    <Typography color="textSecondary">Weekly</Typography>
-                    <Typography variant="h6">
-                      ${Math.round(Number(annualSalary) / 52).toLocaleString()}
-                    </Typography>
-                  </Grid>
-                </Grid>
-              )}
-            </CardContent>
-          </Card>
+  if (error) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <Alert severity="error">{error}</Alert>
+      </Box>
+    );
+  }
 
-          <Grid container spacing={3} sx={{ mb: 3 }}>
-            <Grid item xs={12} md={4}>
-              <ExpenseList
-                title="Fixed Expenses"
-                expenses={budget.fixed}
-                onEdit={handleEditExpense}
-                onDelete={handleDeleteExpense}
+  return (
+    <div className="budget">
+      <div>
+        <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
+      </div>
+      <div className={`content ${sidebarOpen ? 'expand' : 'collapse'}`}>
+        <Card sx={{ mb: 3 }}>
+          <CardContent>
+            <Typography variant="h6" gutterBottom>
+              Salary Information
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+              <TextField
+                type="number"
+                label="Annual Salary"
+                value={annualSalary}
+                onChange={(e) => setAnnualSalary(e.target.value)}
+                fullWidth
               />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <ExpenseList
-                title="Variable Expenses"
-                expenses={budget.variable}
-                onEdit={handleEditExpense}
-                onDelete={handleDeleteExpense}
-              />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <ExpenseList
-                title="Savings & Investments"
-                expenses={budget.allocation}
-                onEdit={handleEditExpense}
-                onDelete={handleDeleteExpense}
-              />
-            </Grid>
-          </Grid>
-
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>Budget Overview</Typography>
-              <Box sx={{ height: 400 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={getBudgetData()}
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={160}
-                      label={({ name, percent }) => 
-                        `${name} ${(percent * 100).toFixed(0)}%`
-                      }
-                    >
-                      {COLORS.map((color, index) => (
-                        <Cell key={`cell-${index}`} fill={color} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                    <Legend />
-                  </PieChart>
-                </ResponsiveContainer>
-              </Box>
-            </CardContent>
-          </Card>
-        </>
-      )}
-
-      {/* Investment Tab */}
-      {tabValue === 1 && (
-        <>
-          <Grid container spacing={3} sx={{ mb: 3 }}>
-            <Grid item xs={12} sm={6} md={3}>
-              <PortfolioCard
-                title="Total Portfolio"
-                value={142593}
-                trend={12.5}
-                icon={TrendingUp}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <PortfolioCard
-                title="Stocks"
-                value={84224}
-                trend={8.3}
-                icon={ShowChart}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <PortfolioCard
-                title="Crypto"
-                value={23569}
-                trend={-4.2}
-                icon={CurrencyBitcoin}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <PortfolioCard
-                title="Savings"
-                value={34800}
-                trend={2.1}
-                icon={Savings}
-              />
-            </Grid>
-          </Grid>
-
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>Portfolio Performance</Typography>
-              <Box sx={{ height: 400 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={samplePortfolioData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Line type="monotone" dataKey="stocks" stroke="#8884d8" />
-                    <Line type="monotone" dataKey="crypto" stroke="#82ca9d" />
-                    <Line type="monotone" dataKey="savings" stroke="#ffc658" />
-                  </LineChart>
-                </ResponsiveContainer>
-              </Box>
-            </CardContent>
-          </Card>
-        </>
-      )}
-
-      {/* Retirement Tab */}
-      {tabValue === 2 && (
-        <>
-          <Card sx={{ mb: 3 }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>Retirement Calculator</Typography>
+              <Button 
+                variant="contained" 
+                onClick={handleGenerateBudget}
+                sx={{ minWidth: '200px' }}
+              >
+                Generate Budget
+              </Button>
+            </Box>
+            {annualSalary && (
               <Grid container spacing={3}>
-                <Grid item xs={12} md={4}>
-                  <TextField
-                    fullWidth
-                    label="Monthly Contribution"
-                    type="number"
-                    defaultValue="1000"
-                  />
+                <Grid item xs={4}>
+                  <Typography color="textSecondary">Monthly</Typography>
+                  <Typography variant="h6">
+                    ${Math.round(Number(annualSalary) / 12).toLocaleString()}
+                  </Typography>
                 </Grid>
-                <Grid item xs={12} md={4}>
-                  <TextField
-                    fullWidth
-                    label="Expected Return Rate (%)"
-                    type="number"
-                    defaultValue="7"
-                  />
+                <Grid item xs={4}>
+                  <Typography color="textSecondary">Bi-Weekly</Typography>
+                  <Typography variant="h6">
+                    ${Math.round(Number(annualSalary) / 26).toLocaleString()}
+                  </Typography>
                 </Grid>
-                <Grid item xs={12} md={4}>
-                  <TextField
-                    fullWidth
-                    label="Inflation Rate (%)"
-                    type="number"
-                    defaultValue="2"
-                  />
+                <Grid item xs={4}>
+                  <Typography color="textSecondary">Weekly</Typography>
+                  <Typography variant="h6">
+                    ${Math.round(Number(annualSalary) / 52).toLocaleString()}
+                  </Typography>
                 </Grid>
               </Grid>
-            </CardContent>
-          </Card>
+            )}
+          </CardContent>
+        </Card>
 
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>Retirement Projection</Typography>
-              <Box sx={{ height: 400 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={[
-                    { age: 30, balance: 50000 },
-                    { age: 40, balance: 300000 },
-                    { age: 50, balance: 800000 },
-                    { age: 60, balance: 1800000 },
-                    { age: 65, balance: 2500000 },
-                  ]}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="age" />
-                    <YAxis />
-                    <Tooltip formatter={(value) => `${value.toLocaleString()}`} />
-                    <Legend />
-                    <Line type="monotone" dataKey="balance" stroke="#8884d8" name="Portfolio Balance" />
-                  </LineChart>
-                </ResponsiveContainer>
-              </Box>
-            </CardContent>
-          </Card>
-        </>
-      )}
+        <Grid container spacing={3} sx={{ mb: 3 }}>
+          <Grid item xs={12} md={4}>
+            <ExpenseList
+              title="Fixed Expenses"
+              expenses={budget.fixed}
+              onEdit={handleEditExpense}
+              onDelete={handleDeleteExpense}
+              onAdd={() => handleAddItem('fixed')}
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <ExpenseList
+              title="Variable Expenses"
+              expenses={budget.variable}
+              onEdit={handleEditExpense}
+              onDelete={handleDeleteExpense}
+              onAdd={() => handleAddItem('variable')}
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <ExpenseList
+              title="Savings & Investments"
+              expenses={budget.allocation}
+              onEdit={handleEditExpense}
+              onDelete={handleDeleteExpense}
+              onAdd={() => handleAddItem('allocation')}
+            />
+          </Grid>
+        </Grid>
 
-      {/* Edit Dialog */}
+        <Card>
+          <CardContent>
+            <Typography variant="h6" gutterBottom>Budget Overview</Typography>
+            <Box sx={{ height: 400 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={getBudgetData()}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={160}
+                    label={({ name, percent }) => 
+                      `${name} ${(percent * 100).toFixed(0)}%`
+                    }
+                  >
+                    {COLORS.map((color, index) => (
+                      <Cell key={`cell-${index}`} fill={color} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </Box>
+          </CardContent>
+        </Card>
+      </div>
+
       <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)}>
         <DialogTitle>Edit Expense</DialogTitle>
         <DialogContent>
           <TextField
-            autoFocus
-            margin="dense"
             label="Name"
-            type="text"
-            fullWidth
             value={editName}
             onChange={(e) => setEditName(e.target.value)}
+            fullWidth
+            sx={{ mb: 2, mt: 2 }}
           />
           <TextField
-            margin="dense"
             label="Amount"
             type="number"
-            fullWidth
             value={editAmount}
             onChange={(e) => setEditAmount(e.target.value)}
+            fullWidth
           />
         </DialogContent>
         <DialogActions>
@@ -437,7 +476,41 @@ function Budget() {
           <Button onClick={handleSaveEdit} variant="contained">Save</Button>
         </DialogActions>
       </Dialog>
-    </Box>
+
+      <Dialog open={addDialogOpen} onClose={() => setAddDialogOpen(false)}>
+        <DialogTitle>Add New Item</DialogTitle>
+        <DialogContent>
+          <TextField
+            label="Name"
+            value={addName}
+            onChange={(e) => setAddName(e.target.value)}
+            fullWidth
+            sx={{ mb: 2, mt: 2 }}
+          />
+          <TextField
+            label="Amount"
+            type="number"
+            value={addAmount}
+            onChange={(e) => setAddAmount(e.target.value)}
+            fullWidth
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setAddDialogOpen(false)}>Cancel</Button>
+          <Button onClick={handleSaveNewItem} variant="contained">Save</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Snackbar 
+        open={message.open} 
+        autoHideDuration={6000} 
+        onClose={() => setMessage(prev => ({ ...prev, open: false }))}
+      >
+        <Alert severity={message.type} sx={{ width: '100%' }}>
+          {message.text}
+        </Alert>
+      </Snackbar>
+    </div>
   );
 }
 

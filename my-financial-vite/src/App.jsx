@@ -6,8 +6,10 @@ import Budget from './components/Budget/Budget';
 import Investment from './components/Investment/Investment';
 import Retirement from './components/Retirement/Retirement';
 import Login from './components/Login/Login';
-import Signup from './components/Signup/Signup';
+import Register from './components/Register/Register';
 import Planning from './components/Planning/Planning';
+import RegisterForm from './components/RegisterForm/RegisterForm';
+import GenAI from './components/GenAI/GenAI';
 
 function App() {
   return (
@@ -15,11 +17,13 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/budget" element={<Budget />} />
         <Route path="/investment" element={<Investment />} />
         <Route path="/planning" element={<Planning />} />
         <Route path="/retirement" element={<Retirement />} />
+        <Route path="/registerform" element={<RegisterForm />}/>
+        <Route path="/recipe" element={<GenAI />}/>
       </Routes>
     </div>
   )

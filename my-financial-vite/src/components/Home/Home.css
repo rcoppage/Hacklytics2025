@@ -1,42 +1,41 @@
-.home .image-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: -1;
+.home .home-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    padding-left: 100px;
+    padding-right: 100px;
 }
 
-.home .image-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    filter: brightness(30%);
+.home .right-container img {
+    width: 500px;
+    height: auto;
 }
 
-.home .container {  
+.home .left-container {  
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: left;
 }
 
-.home .container h1 {
-    font-size: 100px;
+.home .left-container h1 {
+    font-size: 80px;
+    color: black;
 }
 
-.home .container p {
-    font-size: 25px;
-    margin-left: 150px;
+.home .left-container p {
+    font-size: 20px;
     margin-right: 150px;
+    color: black;
 }
 
-.home .container .try-btn {
+.home .left-container .try-btn {
     margin-top: 20px;
     width: 200px;
     height: 60px;
     background-color: rgb(101, 120, 132);
-    color: white;
-    font-size: 20px;
+    color: rgb(0, 0, 0);
+    font-size: 25px;
     display: flex;
     justify-content: center;
     align-items: center;

@@ -2,20 +2,25 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    background-color: rgb(0, 0, 0);
+    background-color: rgb(67, 74, 84);
     color: white;
     display: flex;
     width: 100%;
-    padding-top: 10px;
-    padding-bottom: 10px;
 }
 
 .navbar .left-side {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     padding-left: 50px;
 }
 
 .navbar .left-side .title {
-    font-size: 30px;
+    display: flex;
+    justify-self: center;
+    align-items: center;
+    font-size: 35px;
+    background-color: transparent;
 }
 
 .navbar .right-side {
@@ -26,13 +31,23 @@
 }
 
 .navbar .right-side .login-btn {
+    display: flex;
     margin-right: 20px;
-    width: 100px;
-    background-color: rgb(91, 107, 108);
+    width: 140px;
+    height: 50px;
+    font-size: 22px;
+    background-color: rgb(114, 100, 121);
+    justify-content: center;
+    align-items: center;
 }
 
 .navbar .right-side .signup-btn {
+    display: flex;
     margin-left: 20px;
-    width: 100px;
+    font-size: 22px;
+    width: 140px;
+    height: 50px;
     background-color: rgb(0, 109, 117);
+    justify-content: center;
+    align-items: center;
 }

@@ -1,4 +1,4 @@
-.login .login-container {
+.register .register-container {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -11,14 +11,14 @@
     padding-bottom: 40px;
 }
 
-.login .login-container h1 {
+.register .register-container h1 {
     font-size: 60px;
     margin-top: 25px;
     font-weight: bold;
     justify-self: center;
 }
 
-.login .register-form {
+.register .register-form {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -27,18 +27,18 @@
     width: 100%;
 }
 
-.login-form .email {
+.register-form .email {
     margin-top: 15px;
     margin-bottom: 15px;
     width: 400px;
 }
 
-.login-form .password {
+.register-form .password {
     margin-bottom: 45px;
     width: 400px;
 }
 
-.login-form .submit-btn {
+.register-form .submit-btn {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -46,19 +46,19 @@
     font-size: 25px;
     background-color: #006D75;
     margin-top: 15px;
-    margin-bottom: 25px;
+    margin-bottom: 15px;
     width: 400px;
     height: 50px;
     text-align: center;
 }
 
-.login-form .google-logo {
+.register-form .google-logo {
     width: 30px;
     height: 30px;
     margin-right: 30px;
 }
 
-.login-form .google-btn {
+.register-form .google-btn {
     display: flex;
     align-items: center;
     justify-content: center;
