@@ -5,9 +5,9 @@ import './Budget.css';
 import Sidebar from '../Sidebar/Sidebar';
 
 import { Box, Card, CardContent, Typography, TextField, Button, 
-   Grid, IconButton } from '@mui/material';
+   Grid, IconButton, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28'];
 
@@ -40,7 +40,7 @@ const generateBudget = (monthlySalary) => {
   };
 };
 
-const ExpenseList = ({ title, expenses, onEdit, onDelete }) => (
+const ExpenseList = ({ title, expenses, onEdit, onDelete, onAdd }) => (
   <Card sx={{ height: '100%' }}>
     <CardContent>
       <Typography variant="h6" gutterBottom>{title}</Typography>
@@ -67,6 +67,14 @@ const ExpenseList = ({ title, expenses, onEdit, onDelete }) => (
           </Box>
         </Box>
       ))}
+      <Button 
+        variant="contained" 
+        startIcon={<AddIcon />} 
+        onClick={onAdd}
+        sx={{ mt: 2 }}
+      >
+        Add New Item
+      </Button>
     </CardContent>
   </Card>
 );
@@ -79,6 +87,10 @@ function Budget() {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editName, setEditName] = useState('');
   const [editAmount, setEditAmount] = useState('');
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [addCategory, setAddCategory] = useState('');
+  const [addName, setAddName] = useState('');
+  const [addAmount, setAddAmount] = useState('');
 
   const samplePortfolioData = [
     { month: 'Jan', stocks: 4000, crypto: 2400, savings: 2400 },
@@ -131,6 +143,29 @@ function Budget() {
       );
     });
     setBudget(updatedBudget);
+  };
+
+  const handleAddItem = (category) => {
+    setAddCategory(category);
+    setAddDialogOpen(true);
+  };
+
+  const handleSaveNewItem = () => {
+    if (!addName || !addAmount) return;
+
+    const newItem = {
+      id: `${addCategory}-${Date.now()}`,
+      name: addName,
+      amount: Number(addAmount)
+    };
+
+    const updatedBudget = { ...budget };
+    updatedBudget[addCategory] = [...updatedBudget[addCategory], newItem];
+    setBudget(updatedBudget);
+
+    setAddDialogOpen(false);
+    setAddName('');
+    setAddAmount('');
   };
 
   const getBudgetData = () => [
@@ -212,6 +247,7 @@ function Budget() {
               expenses={budget.fixed}
               onEdit={handleEditExpense}
               onDelete={handleDeleteExpense}
+              onAdd={() => handleAddItem('fixed')}
             />
           </Grid>
           <Grid item xs={12} md={4}>
@@ -220,6 +256,7 @@ function Budget() {
               expenses={budget.variable}
               onEdit={handleEditExpense}
               onDelete={handleDeleteExpense}
+              onAdd={() => handleAddItem('variable')}
             />
           </Grid>
           <Grid item xs={12} md={4}>
@@ -228,6 +265,7 @@ function Budget() {
               expenses={budget.allocation}
               onEdit={handleEditExpense}
               onDelete={handleDeleteExpense}
+              onAdd={() => handleAddItem('allocation')}
             />
           </Grid>
         </Grid>
@@ -259,6 +297,54 @@ function Budget() {
           </CardContent>
         </Card>
       </div>
+
+      <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)}>
+        <DialogTitle>Edit Expense</DialogTitle>
+        <DialogContent>
+          <TextField
+            label="Name"
+            value={editName}
+            onChange={(e) => setEditName(e.target.value)}
+            fullWidth
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            label="Amount"
+            type="number"
+            value={editAmount}
+            onChange={(e) => setEditAmount(e.target.value)}
+            fullWidth
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
+          <Button onClick={handleSaveEdit}>Save</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={addDialogOpen} onClose={() => setAddDialogOpen(false)}>
+        <DialogTitle>Add New Item</DialogTitle>
+        <DialogContent>
+          <TextField
+            label="Name"
+            value={addName}
+            onChange={(e) => setAddName(e.target.value)}
+            fullWidth
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            label="Amount"
+            type="number"
+            value={addAmount}
+            onChange={(e) => setAddAmount(e.target.value)}
+            fullWidth
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setAddDialogOpen(false)}>Cancel</Button>
+          <Button onClick={handleSaveNewItem}>Save</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }

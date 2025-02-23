@@ -7,25 +7,29 @@ import './GenAI.css'
 
 const GenAI = () => {
     const [sidebarOpen, setSidebarOpen] = useState(true);
+    var response
     const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
+        setSidebarOpen(!sidebarOpen);
     };
-    const handleSubmit = (event) => {
+    async function handleSubmit(event){
         event.preventDefault();
-        /*
-    const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const WeeklyBudget = event.target.WeeklyBudgetInput.value;
+        const HomecookedMeal = event.target.HomecookedMealsInput.value;
+        const DietaryRestrictions = event.target.DietaryRestrictionsInput.value;
+        const MaxTimePerMeal = event.target.MaxTimePerMealInput.value;
 
-    const prompt = "Explain how AI works";
+        prompt = "Generate a meal plan for the week based on the following criteria: My budget is [$"+WeeklyBudget+"] per week, and I need ["+ HomecookedMeal+"] meals. \
+        I follow ["+DietaryRestrictions +"]. I also cannot spend more than ["+MaxTimePerMeal+"] minutes on a recipe. Ensure that the combined preparation and cook time are less than ["+MaxTimePerMeal+"]. Provide a variety of meals with simple recipes, ingredient lists, and estimated costs per meal. Prioritize affordability, nutrition, and ease of preparation. Ensure that the recipes are extremely detailed"
 
-    const result = await model.generateContent(prompt);
-    console.log(result.response.text());
-    */
-    console.log(event.target.WeeklyBudgetInput.value)
-    console.log(event.target.HomecookedMealsInput.value)
-    console.log(event.target.DietaryRestrictionsInput.value)
-    console.log(event.target.MaxTimePerMealInput.value)
+        console.log(prompt);
 
+        const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+        const result = await model.generateContent(prompt);
+        console.log(result.response.text());
+        document.getElementById("APIResponse").innerText = result.response.text();
+        document.getElementById("APIResponse").style.color = "black";
 
     }
 // Budget, Homecooked Meals, Dietary Restrictions, Max time per meal,  
@@ -33,9 +37,6 @@ const GenAI = () => {
         <div>
             <div>
                 <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
-                <Sidebar />
-            </div>
-            <div>
             </div>
             <div className={`content ${sidebarOpen ?   'expand' : 'collapse'}`}>
                 <Box component="form" noValidate sx={{ mt: 1}} onSubmit={handleSubmit}>
@@ -67,6 +68,9 @@ const GenAI = () => {
                         <Button type="submit" style={{color: "black"}} variant='contained'>Generate GenAI</Button>
                     </div>
                 </Box>
+                <div className="APIResponse" id="APIResponse">
+                    <p style={{color: "black"}}>{response}</p>
+                </div>
             </div>
         </div>
     )
