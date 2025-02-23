@@ -8,6 +8,11 @@
     width: 100%;
 }
 
+.navbar .logo-navbar {
+    width: 70px;
+    height: auto;
+}
+
 .navbar .left-side {
     display: flex;
     justify-content: center;

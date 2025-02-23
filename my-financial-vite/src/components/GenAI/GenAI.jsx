@@ -7,7 +7,7 @@ import './GenAI.css'
 
 const GenAI = () => {
     const [sidebarOpen, setSidebarOpen] = useState(true);
-    var response
+    const [response, setResponse] = useState("");
     const toggleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
     };
@@ -28,48 +28,101 @@ const GenAI = () => {
 
         const result = await model.generateContent(prompt);
         console.log(result.response.text());
-        document.getElementById("APIResponse").innerText = result.response.text();
         document.getElementById("APIResponse").style.color = "black";
+        const response2 = formatLines(result.response.text().split("\n"));
+        setResponse(response2)
 
     }
+    const formatLines = (lines) => {
+        return lines.map((line, index) => {
+            let className = '';
+            if (line.substring(0,3) === '## ') {
+                className = 'bold';
+                line = line.replaceAll('#','');
+                return (
+                    <h1 key={index} className={className}>
+                    {line}
+                    </h1>
+                );
+            } else if (line.substring(0,2) === '**') {
+                className = 'italic';
+                line = line.substring(2);
+                line = line.replaceAll('*','');
+                return (
+                    <h2 key={index} className={className}>
+                    {line}
+                    </h2>
+                );
+            } else if (line.substring(0,4) === '* **') {
+                className = 'underline';
+                line = line.substring(3);
+                line = line.replaceAll('*','');
+                return (
+                    <h3 key={index} className={className}>
+                    {line}
+                    </h3>
+                );
+            } else {
+                className = 'normal';
+                line = line.replaceAll('*','');
+            }
+
+            return (
+                <div key={index} className={className}>
+                {line}
+                </div>
+            );
+        });
+      };
 // Budget, Homecooked Meals, Dietary Restrictions, Max time per meal,  
     return (
-        <div>
+        <div className="genAI">
             <div>
-                <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
+                <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} labelSelected={4}/>
             </div>
             <div className={`content ${sidebarOpen ?   'expand' : 'collapse'}`}>
+                <h1>Meal Planner</h1>
                 <Box component="form" noValidate sx={{ mt: 1}} onSubmit={handleSubmit}>
-                    <div>
-                        <p style={{color: "black"}}>Weekly Budget</p>
-                    </div>
-                    <div className="WeeklybudgetInput">
-                        <TextField name="WeeklyBudgetInput"></TextField>
-                    </div>
-                    <div>
-                        <p style={{color: "black"}}>Number of Homecooked Meals</p>
-                    </div>
-                    <div className="HomecookedMealsInput">
-                        <TextField name="HomecookedMealsInput"></TextField>
-                    </div>
-                    <div>
-                        <p style={{color: "black"}}>Dietary Restrictions</p>
-                    </div>
-                    <div className="DietaryRestrictionsInput">
-                        <TextField name="DietaryRestrictionsInput"></TextField>
-                    </div>
-                    <div>
-                        <p style={{color: "black"}}>Max time to cook meal(minutes)</p>
-                    </div>
-                    <div className="MaxTimePerMeal">
-                        <TextField name="MaxTimePerMealInput"></TextField>
-                    </div>
-                    <div className="GenButton" style={{margin: 20}}>
-                        <Button type="submit" style={{color: "black"}} variant='contained'>Generate GenAI</Button>
+                    <div className="main-container">
+                        <div className="input-container">
+                            <div>
+                                <p style={{color: "black"}}>Weekly Budget</p>
+                            </div>
+                            <div className="WeeklybudgetInput">
+                                <TextField name="WeeklyBudgetInput"></TextField>
+                            </div>
+                        </div>
+                        <div className="input-container">
+                            <div>
+                                <p style={{color: "black"}}>Number of Homecooked Meals</p>
+                            </div>
+                            <div className="HomecookedMealsInput">
+                                <TextField name="HomecookedMealsInput"></TextField>
+                            </div>
+                        </div>
+                        <div className="input-container">
+                            <div>
+                                <p style={{color: "black"}}>Dietary Restrictions</p>
+                            </div>
+                            <div className="DietaryRestrictionsInput">
+                                <TextField name="DietaryRestrictionsInput"></TextField>
+                            </div>
+                        </div>
+                        <div className="input-container last-input">
+                            <div>
+                                <p style={{color: "black"}}>Max time to cook meal (in minutes)</p>
+                            </div>
+                            <div className="MaxTimePerMeal">
+                                <TextField name="MaxTimePerMealInput"></TextField>
+                            </div>
+                        </div>
+                        <div className="GenButton" style={{margin: 20}}>
+                            <button className="gen-btn" type="submit" style={{color: "black"}} variant='contained'>Create Recipes</button>
+                        </div>
                     </div>
                 </Box>
                 <div className="APIResponse" id="APIResponse">
-                    <p style={{color: "black"}}>{response}</p>
+                    <div className="Response">{response}</div>
                 </div>
             </div>
         </div>

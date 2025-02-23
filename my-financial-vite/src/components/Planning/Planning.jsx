@@ -64,7 +64,7 @@ function Planning() {
     return (
         <div className="planning-container">
             <div>
-                <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
+                <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} labelSelected={3}/>
             </div>
             <div className={`content ${sidebarOpen ?   'expand' : 'collapse'}`}>
                 <h1 className="planning-title">Investment Calculator</h1>

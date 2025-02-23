@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './Budget.css';
+import './Budget.css'; // Import the CSS file
 import Sidebar from '../Sidebar/Sidebar';
 import { getAuth } from 'firebase/auth';
 
@@ -44,21 +44,15 @@ const generateBudget = (monthlySalary) => {
 
 const ExpenseList = ({ title, expenses, onEdit, onDelete, onAdd }) => (
   <Card sx={{ height: '100%' }}>
-    <CardContent>
+    <CardContent className="card-content">
       <Typography variant="h6" gutterBottom>{title}</Typography>
       <Typography variant="h4" gutterBottom>
         ${expenses.reduce((sum, exp) => sum + exp.amount, 0).toLocaleString()}
       </Typography>
       {expenses.map((expense) => (
-        <Box key={expense.id} sx={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center',
-          p: 1,
-          '&:hover': { bgcolor: 'action.hover' }
-        }}>
+        <Box key={expense.id} className="expense-item">
           <Typography>{expense.name}</Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Box className="expense-actions">
             <Typography sx={{ mr: 2 }}>${expense.amount.toLocaleString()}</Typography>
             <IconButton size="small" onClick={() => onEdit(expense)}>
               <EditIcon fontSize="small" />
@@ -116,7 +110,7 @@ function Budget() {
         return;
       }
 
-      const response = await fetch('http://localhost:5000/update-budget', {
+      const response = await fetch('http://localhost:3001/update-budget', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -161,7 +155,7 @@ function Budget() {
         return;
       }
 
-      const response = await fetch(`http://localhost:5000/get-financial-data/${user.uid}`);
+      const response = await fetch(`http://localhost:3001/get-financial-data/${user.uid}`);
       const data = await response.json();
 
       if (data.success && data.data) {
@@ -329,7 +323,7 @@ function Budget() {
 
   if (isLoading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <Box className="loading-container">
         <CircularProgress />
       </Box>
     );
@@ -337,7 +331,7 @@ function Budget() {
 
   if (error) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <Box className="error-container">
         <Alert severity="error">{error}</Alert>
       </Box>
     );
@@ -346,11 +340,13 @@ function Budget() {
   return (
     <div className="budget">
       <div>
-        <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
+        <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} labelSelected={1}/>
       </div>
       <div className={`content ${sidebarOpen ? 'expand' : 'collapse'}`}>
+        <h1>Budget Planner</h1>
+        <div className="full-content">
         <Card sx={{ mb: 3 }}>
-          <CardContent>
+          <CardContent className="card-content">
             <Typography variant="h6" gutterBottom>
               Salary Information
             </Typography>
@@ -426,7 +422,7 @@ function Budget() {
         </Grid>
 
         <Card>
-          <CardContent>
+          <CardContent className="card-content">
             <Typography variant="h6" gutterBottom>Budget Overview</Typography>
             <Box sx={{ height: 400 }}>
               <ResponsiveContainer width="100%" height="100%">
@@ -451,11 +447,12 @@ function Budget() {
             </Box>
           </CardContent>
         </Card>
+        </div>
       </div>
 
       <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)}>
         <DialogTitle>Edit Expense</DialogTitle>
-        <DialogContent>
+        <DialogContent className="dialog-content">
           <TextField
             label="Name"
             value={editName}
@@ -479,7 +476,7 @@ function Budget() {
 
       <Dialog open={addDialogOpen} onClose={() => setAddDialogOpen(false)}>
         <DialogTitle>Add New Item</DialogTitle>
-        <DialogContent>
+        <DialogContent className="dialog-content">
           <TextField
             label="Name"
             value={addName}
@@ -506,7 +503,7 @@ function Budget() {
         autoHideDuration={6000} 
         onClose={() => setMessage(prev => ({ ...prev, open: false }))}
       >
-        <Alert severity={message.type} sx={{ width: '100%' }}>
+        <Alert severity={message.type} className="snackbar-alert">
           {message.text}
         </Alert>
       </Snackbar>
