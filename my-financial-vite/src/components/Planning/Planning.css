@@ -1,7 +1,7 @@
 .planning-container {
     min-height: 100vh;
     width: 100vw;
-    background-color: #ffffff;
+    background-color: #E6E4E4;
     position: relative;
 }
 
@@ -10,13 +10,11 @@
     font-weight: 600;
     padding: 1rem 2rem;
     color: #1a1a1a;
-    background-color: white;
     margin: 0;
     border-bottom: 1px solid #e5e7eb;
 }
 
 .planning-card {
-    background: white;
     min-height: calc(100vh - 4.5rem); /* Subtract title height */
     padding: 1.5rem;
 }
