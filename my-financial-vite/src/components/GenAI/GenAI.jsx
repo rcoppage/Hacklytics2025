@@ -78,7 +78,7 @@ const GenAI = () => {
     return (
         <div className="genAI">
             <div>
-                <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
+                <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} labelSelected={4}/>
             </div>
             <div className={`content ${sidebarOpen ?   'expand' : 'collapse'}`}>
                 <h1>Meal Planner</h1>
