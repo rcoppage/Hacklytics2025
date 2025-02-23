@@ -67,8 +67,12 @@ function Planning() {
                 <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
             </div>
             <div className={`content ${sidebarOpen ?   'expand' : 'collapse'}`}>
-                <h1 className="planning-title">Investment Calculator</h1>
+                <h1 className="planning-title">Financial Planning</h1>
+                
                 <div className="planning-card">
+                    <div className="card-header">
+                        <h2 className="card-title">Investment Calculator</h2>
+                    </div>
                     <div className="planning-grid">
                         <div className="top-section">
                             <div className="input-section">

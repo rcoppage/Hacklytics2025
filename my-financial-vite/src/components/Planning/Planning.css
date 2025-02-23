@@ -1,6 +1,8 @@
 .planning-container {
-    display: flex;
-    background-color: #f0f0f0;
+    min-height: 100vh;
+    width: 100vw;
+    background-color: #ffffff;
+    position: relative;
 }
 
 .planning-title {
@@ -8,7 +10,19 @@
     font-weight: 600;
     padding: 1rem 2rem;
     color: #1a1a1a;
-    margin-top: 30px;
+    background-color: white;
+    margin: 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.planning-card {
+    background: white;
+    min-height: calc(100vh - 4.5rem); /* Subtract title height */
+    padding: 1.5rem;
+}
+
+.card-header {
+    margin-bottom: 1.5rem;
 }
 
 .card-title {
@@ -22,6 +36,7 @@
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    height: calc(100% - 3.5rem); /* Subtract header height */
 }
 
 .top-section {
@@ -33,13 +48,11 @@
 .bottom-section {
     display: flex;
     gap: 1.5rem;
-    height: 60%;
-    margin-bottom: 50px;
+    height: 40%;
 }
 
 .input-section, .contribution-section {
     flex: 1;
-    width: 550px;
     background: #f8fafc;
     padding: 1.5rem;
     border-radius: 0.5rem;
@@ -47,13 +60,7 @@
     flex-direction: column;
     gap: 1.5rem;
     overflow-y: auto;
-    overflow-x: hidden;
-    transition: width 0.3s ease;
-}
-
-.content.collapse .contribution-section {
-    width: 850px;
-    transition: width 0.3s ease;
+    overflow-x: hidden; /* Prevent horizontal overflow */
 }
 
 .chart-section {
@@ -91,7 +98,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    width: 100%;
+    width: 100%; /* Ensure input groups take full width */
 }
 
 .input-group label {
@@ -105,11 +112,11 @@
     border: 2px solid #e5e7eb;
     border-radius: 0.5rem;
     font-size: 1.1rem;
-    width: 100%;
+    width: 100%; /* Ensure inputs take full width */
     transition: all 0.2s;
     background-color: white;
-    color: #1a1a1a;
-    box-sizing: border-box;
+    color: #1a1a1a; /* Ensure text is black */
+    box-sizing: border-box; /* Include padding and border in the element's total width */
 }
 
 .form-input:focus {
@@ -130,8 +137,8 @@ select.form-input {
     background-size: 1em;
     padding-right: 2.5rem;
     cursor: pointer;
-    color: #1a1a1a;
-    box-sizing: border-box;
+    color: #1a1a1a; /* Ensure text is black */
+    box-sizing: border-box; /* Include padding and border in the element's total width */
 }
 
 select.form-input:hover {
@@ -149,6 +156,7 @@ select.form-input:hover {
 .summary-section {
     flex: 1;
     background-color: #f0f9ff;
+    padding: 1.5rem;
     border-radius: 0.5rem;
     border-left: 4px solid #2563eb;
     display: flex;
@@ -158,7 +166,6 @@ select.form-input:hover {
 .summary-text {
     font-size: 1.25rem;
     color: #1e3a8a;
-    margin-left: 30px;
 }
 
 .summary-text strong {
@@ -178,6 +185,7 @@ select.form-input:hover {
     margin-top: 0.5rem;
 }
 
+/* Custom number input styling */
 input[type="number"] {
     -moz-appearance: textfield;
 }

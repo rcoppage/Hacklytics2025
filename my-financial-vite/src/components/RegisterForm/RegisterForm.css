@@ -1,82 +1,15 @@
-.RegisterForm {
-    display: flex;
-    flex-direction: column;
-    overflow-x: hidden;
-    width: 100%;
-}
-
-.RegisterForm h1 {
-    color: black;
-    display: flex;
-    justify-content: center;
-}
-
 .RegisterForm .mainInput{
-    margin-top: 30px;
     display: flex;
     justify-content: center;
+    flex-direction: column;
     align-items: center;
-    flex-wrap: wrap;
 }
-
-.RegisterForm .inputContainer {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    max-width: 100%;
-    flex-wrap: wrap;
-}
-
-.RegisterForm .inputSection {
-    margin-left: 20px;
+.RegisterForm .mainInput .inputLabel{
     margin-right: 20px;
-    margin-bottom: 30px;
 }
 
-.inputLabel {
-    font-size: 1.2rem;
-    font-weight: 500;
-    color: #333;
-}
-
-.inputSection {
-    background-color: rgb(239, 239, 239);
-    width: 300px;
-    height: 150px;
-    padding-left: 30px;
-    padding-right: 30px;
-    border-radius: 15px;
-}
-
-.RegisterForm .nextButtons {
+.RegisterForm .mainInput.nextButtons{
     display: flex;
-    width: 100%;
-    flex-direction: row;
-    justify-content: center;
-    align-items: flex-start;
-    margin-top: 30px;
+    margin-top: 20px;
 }
 
-.RegisterForm .nextButtons .skip-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #605268;
-    margin-left: 30px;
-    margin-right: 30px;
-    width: 140px;
-    height: 50px;
-    font-size: 30px;
-}
-
-.RegisterForm .nextButtons .next-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #015157;
-    margin-left: 30px;
-    margin-right: 30px;
-    width: 140px;
-    height: 50px;
-    font-size: 30px;
-}

@@ -42,49 +42,20 @@ app.get('/test', async (req, res) => {
   }
 });
 
-// Get user's financial data
-app.get('/get-financial-data/:userId', async (req, res) => {
-  try {
-    const db = await connectToMongo();
-    const payments = db.collection('Payments');
-    
-    const userData = await payments.findOne({ userId: req.params.userId });
-    
-    if (!userData) {
-      return res.status(404).json({
-        success: false,
-        error: 'User data not found'
-      });
-    }
-
-    res.json({
-      success: true,
-      data: userData
-    });
-    
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to fetch data'
-    });
-  }
-});
-
 // Store financial data
 app.post('/store-financial-data', async (req, res) => {
   try {
     console.log('Received data:', req.body);
     
     const db = await connectToMongo();
-    const payments = db.collection('Payments');
+    const payments = db.collection('Payments');  //Collection
     
     const { 
       userId, 
       username, 
       salary, 
       monthlyRent, 
-      grocerySpending,
+      groccerySpending,
       transportationCost,
       insuranceCost 
     } = req.body;
@@ -103,7 +74,7 @@ app.post('/store-financial-data', async (req, res) => {
       financialInfo: {
         salary: Number(salary) || 0,
         monthlyRent: Number(monthlyRent) || 0,
-        grocerySpending: Number(grocerySpending) || 0,
+        groccerySpending: Number(groccerySpending) || 0,
         transportationCost: Number(transportationCost) || 0,
         insuranceCost: Number(insuranceCost) || 0,
       },
@@ -112,7 +83,7 @@ app.post('/store-financial-data', async (req, res) => {
 
     const totalMonthlyExpenses = 
       Number(monthlyRent) + 
-      Number(grocerySpending) + 
+      Number(groccerySpending) + 
       Number(transportationCost) + 
       Number(insuranceCost);
 
@@ -155,43 +126,4 @@ app.listen(PORT, () => {
 process.on('SIGINT', async () => {
   await client.close();
   process.exit(0);
-});
-
-app.post('/update-budget', async (req, res) => {
-  try {
-    const db = await connectToMongo();
-    const payments = db.collection('Payments');
-    
-    const { userId, budget } = req.body;
-
-    if (!userId || !budget) {
-      return res.status(400).json({ 
-        success: false, 
-        error: 'User ID and budget are required' 
-      });
-    }
-    //Saving data after re logging in and refreshing
-    const result = await payments.updateOne(
-      { userId: userId },
-      { 
-        $set: {
-          'budgetInfo': budget,
-          lastUpdated: new Date()
-        }
-      },
-      { upsert: true }
-    );
-
-    res.json({
-      success: true,
-      message: 'Budget updated successfully'
-    });
-
-  } catch (error) {
-    console.error('Error updating budget:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to update budget'
-    });
-  }
 });
