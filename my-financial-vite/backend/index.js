@@ -13,9 +13,10 @@ async function connectToMongo() {
   try {
     await client.connect();
     console.log('Connected to MongoDB');
-    return client.db();
+    return client.db('UserFinance');  // Database
   } catch (error) {
     console.error('MongoDB connection error:', error);
+    throw error;
   }
 }
 
@@ -23,42 +24,86 @@ async function connectToMongo() {
 app.get('/test', async (req, res) => {
   try {
     const db = await connectToMongo();
+    console.log('Test connection successful to UserFinance database');
     res.json({ message: 'Connected to MongoDB!' });
   } catch (error) {
+    console.error('Test connection failed:', error);
     res.status(500).json({ error: 'Failed to connect to MongoDB' });
   }
 });
 
-// Store prompt data
-app.post('/store-prompt', async (req, res) => {
+// Store financial data
+app.post('/store-financial-data', async (req, res) => {
   try {
-    const db = await connectToMongo();
-    const prompts = db.collection('prompts');
+    console.log('Received data:', req.body);
     
-    const promptData = {
-      prompt: req.body.prompt,
-      timestamp: new Date()
+    const db = await connectToMongo();
+    const payments = db.collection('Payments');  //Collection
+    
+    const { 
+      userId, 
+      username, 
+      salary, 
+      monthlyRent, 
+      groccerySpending,
+      transportationCost,
+      insuranceCost 
+    } = req.body;
+
+    if (!userId || !username) {
+      console.log('Missing user information');
+      return res.status(400).json({ 
+        success: false, 
+        error: 'User information is required' 
+      });
+    }
+
+    const userData = {
+      userId: userId,
+      email: username,
+      financialInfo: {
+        salary: Number(salary) || 0,
+        monthlyRent: Number(monthlyRent) || 0,
+        groccerySpending: Number(groccerySpending) || 0,
+        transportationCost: Number(transportationCost) || 0,
+        insuranceCost: Number(insuranceCost) || 0,
+      },
+      lastUpdated: new Date()
     };
 
-    const result = await prompts.insertOne(promptData);
-    console.log('Stored prompt:', promptData);
-    res.json({ message: 'Prompt stored successfully', id: result.insertedId });
-  } catch (error) {
-    console.error('Error storing prompt:', error);
-    res.status(500).json({ error: 'Failed to store prompt' });
-  }
-});
+    const totalMonthlyExpenses = 
+      Number(monthlyRent) + 
+      Number(groccerySpending) + 
+      Number(transportationCost) + 
+      Number(insuranceCost);
 
-// Get all stored prompts
-app.get('/prompts', async (req, res) => {
-  try {
-    const db = await connectToMongo();
-    const prompts = db.collection('prompts');
-    
-    const allPrompts = await prompts.find({}).toArray();
-    res.json(allPrompts);
+    userData.financialInfo.totalMonthlyExpenses = totalMonthlyExpenses;
+    userData.financialInfo.monthlyIncome = Number(salary) / 12;
+    userData.financialInfo.monthlySavings = (Number(salary) / 12) - totalMonthlyExpenses;
+
+    console.log('Attempting to store in Payments collection:', userData);
+
+    const result = await payments.updateOne(
+      { userId: userId },
+      { $set: userData },
+      { upsert: true }
+    );
+
+    console.log('MongoDB operation result:', result);
+
+    res.json({
+      success: true,
+      message: 'Data stored successfully',
+      monthlyExpenses: totalMonthlyExpenses,
+      monthlySavings: userData.financialInfo.monthlySavings
+    });
+
   } catch (error) {
-    res.status(500).json({ error: 'Failed to retrieve prompts' });
+    console.error('Error storing data:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to store data'
+    });
   }
 });
 
@@ -71,41 +116,4 @@ app.listen(PORT, () => {
 process.on('SIGINT', async () => {
   await client.close();
   process.exit(0);
-});
-
-app.post('/store-financial-data', async (req, res) => {
-  try {
-    const db = await connectToMongo();
-    const financialData = db.collection('financial_data');
-    
-    const { userId, username, salary, monthlyRent, monthlyDebt } = req.body;
-
-    // Create the document to store
-    const userData = {
-      userId,
-      username,
-      salary: Number(salary) || 0,
-      monthlyRent: Number(monthlyRent) || 0,
-      monthlyDebt: Number(monthlyDebt) || 0,
-      timestamp: new Date()
-    };
-
-    // Check if user already exists and update if they do
-    const result = await financialData.updateOne(
-      { userId: userId },
-      { $set: userData },
-      { upsert: true } // Creates new document if it doesn't exist
-    );
-
-    res.json({ 
-      success: true, 
-      message: 'Financial data stored successfully'
-    });
-  } catch (error) {
-    console.error('Error storing financial data:', error);
-    res.status(500).json({ 
-      success: false, 
-      error: 'Failed to store financial data' 
-    });
-  }
 });
