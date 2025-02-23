@@ -1,7 +1,7 @@
 import "./RegisterForm.css"
-import { Box, Button, Container, TextField, Typography, Snackbar, Alert } from '@mui/material';
+import { Box, Button, Container, TextField, Typography, Snackbar, Alert, CircularProgress } from '@mui/material';
 import Navbar from "../Navbar/Navbar";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { getAuth } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 
@@ -17,11 +17,31 @@ const RegisterForm = () => {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState({ text: '', type: 'success', open: false });
 
-    const handleInputChange = (e, field) => {
-        setFormData({
-            ...formData,
-            [field]: e.target.value
+    useEffect(() => {
+        // Check if user is authenticated
+        const auth = getAuth();
+        const unsubscribe = auth.onAuthStateChanged(user => {
+            if (!user) {
+                setMessage({
+                    text: 'Please log in first',
+                    type: 'error',
+                    open: true
+                });
+                navigate('/login');
+            }
         });
+
+        return () => unsubscribe();
+    }, [navigate]);
+
+    const handleInputChange = (e, field) => {
+        const value = e.target.value;
+        if (value === '' || value >= 0) {  // Allow empty or non-negative numbers
+            setFormData({
+                ...formData,
+                [field]: value
+            });
+        }
     };
 
     const skipPressed = () => {
@@ -29,6 +49,22 @@ const RegisterForm = () => {
     };
 
     const nextPressed = async () => {
+        // Validate inputs
+        const numericFields = ['salary', 'monthlyRent', 'grocerySpending', 'transportationCost', 'insuranceCost'];
+        const hasInvalidFields = numericFields.some(field => {
+            const value = Number(formData[field]);
+            return formData[field] !== '' && (isNaN(value) || value < 0);
+        });
+
+        if (hasInvalidFields) {
+            setMessage({
+                text: 'Please enter valid non-negative numbers',
+                type: 'error',
+                open: true
+            });
+            return;
+        }
+
         setLoading(true);
         try {
             const auth = getAuth();
@@ -63,10 +99,12 @@ const RegisterForm = () => {
                     open: true
                 });
                 navigate('/Budget'); 
+            } else {
+                throw new Error(data.error || 'Failed to save data');
             }
         } catch (error) {
             setMessage({
-                text: 'Error saving data. Please try again.',
+                text: error.message || 'Error saving data. Please try again.',
                 type: 'error',
                 open: true
             });
@@ -79,20 +117,39 @@ const RegisterForm = () => {
         <div className="RegisterForm">
             <Navbar />
             <div className="mainInput">
+                <Typography variant="h4" align="center" gutterBottom>
+                    Financial Information
+                </Typography>
+                <Typography variant="body1" align="center" gutterBottom color="textSecondary">
+                    Enter your financial details to get personalized budgeting recommendations
+                </Typography>
+                
                 <div className="inputLabel">
-                    <p style={{color: "black"}}>Salary</p>
+                    <p style={{color: "black"}}>Annual Salary</p>
                 </div>
                 <div className="textInput">
                     <TextField 
                         type="number"
                         value={formData.salary}
                         onChange={(e) => handleInputChange(e, 'salary')}
-                        placeholder="Enter your salary"
+                        placeholder="Enter your annual salary"
                         disabled={loading}
+                        fullWidth
                     />
                 </div>
-                <div className="inputLabel">
-                    <p style={{color: "black"}}>Monthly Rent</p>
+                <div className="inputSection">
+                    <div className="inputLabel">
+                        <p>Monthly Grocery Spending</p>
+                    </div>
+                    <div className="textInput">
+                        <TextField 
+                            type="number"
+                            value={formData.grocerySpending}
+                            onChange={(e) => handleInputChange(e, 'grocerySpending')}
+                            placeholder="Enter spending"
+                            disabled={loading}
+                        />
+                    </div>
                 </div>
                 <div className="textInput">
                     <TextField 
@@ -101,6 +158,7 @@ const RegisterForm = () => {
                         onChange={(e) => handleInputChange(e, 'monthlyRent')}
                         placeholder="Enter monthly rent"
                         disabled={loading}
+                        fullWidth
                     />
                 </div>
                 <div className="inputLabel">
@@ -111,8 +169,9 @@ const RegisterForm = () => {
                         type="number"
                         value={formData.grocerySpending}
                         onChange={(e) => handleInputChange(e, 'grocerySpending')}
-                        placeholder="Enter spending"
+                        placeholder="Enter monthly grocery expenses"
                         disabled={loading}
+                        fullWidth
                     />
                 </div>
                 <div className="inputLabel">
@@ -123,8 +182,9 @@ const RegisterForm = () => {
                         type="number"
                         value={formData.transportationCost}
                         onChange={(e) => handleInputChange(e, 'transportationCost')}
-                        placeholder="Enter spending"
+                        placeholder="Enter monthly transportation costs"
                         disabled={loading}
+                        fullWidth
                     />
                 </div>
                 <div className="inputLabel">
@@ -135,13 +195,14 @@ const RegisterForm = () => {
                         type="number"
                         value={formData.insuranceCost}
                         onChange={(e) => handleInputChange(e, 'insuranceCost')}
-                        placeholder="Enter cost"
+                        placeholder="Enter monthly insurance costs"
                         disabled={loading}
+                        fullWidth
                     />
                 </div>
                 <div className="nextButtons">
                     <Button 
-                        variant="contained" 
+                        variant="outlined" 
                         onClick={skipPressed} 
                         disabled={loading}
                     >
@@ -152,20 +213,41 @@ const RegisterForm = () => {
                         onClick={nextPressed}
                         disabled={loading}
                     >
-                        {loading ? 'Saving...' : 'Next'}
+                        {loading ? (
+                            <CircularProgress size={24} color="inherit" />
+                        ) : (
+                            'Save & Continue'
+                        )}
                     </Button>
                 </div>
             </div>
-            <Snackbar 
-                open={message.open} 
-                autoHideDuration={6000} 
-                onClose={() => setMessage(prev => ({ ...prev, open: false }))}
-            >
-                <Alert severity={message.type} sx={{ width: '100%' }}>
-                    {message.text}
-                </Alert>
-            </Snackbar>
+            <div className="nextButtons">
+                <button 
+                    className="skip-btn"
+                    onClick={skipPressed} 
+                    disabled={loading}
+                >
+                    Skip
+                </button>
+                <button 
+                    className="next-btn"
+                    onClick={nextPressed}
+                    disabled={loading}
+                >
+                    {loading ? 'Saving...' : 'Next'}
+                </button>
+            </div>
         </div>
+        <Snackbar 
+            open={message.open} 
+            autoHideDuration={6000} 
+            onClose={() => setMessage(prev => ({ ...prev, open: false }))}
+        >
+            <Alert severity={message.type} sx={{ width: '100%' }}>
+                {message.text}
+            </Alert>
+        </Snackbar>
+    </div>
     );
 };
 
