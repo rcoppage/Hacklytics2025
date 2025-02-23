@@ -1,0 +1,101 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f7fa;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  /* Container for the Stock Market Data */
+  div {
+    width: 80%;
+    max-width: 800px;
+    margin: 20px;
+    padding: 30px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Heading Styles */
+  h1 {
+    text-align: center;
+    color: #333;
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+  
+  /* Market Section Styling */
+  h2 {
+    font-size: 1.6rem;
+    color: #2c3e50;
+    margin-bottom: 10px;
+  }
+  
+  /* Data Paragraph Styling */
+  p {
+    font-size: 1.2rem;
+    color: #34495e;
+    margin: 10px 0;
+    line-height: 1.5;
+  }
+  
+  /* Action Buttons Section */
+  div > p {
+    font-weight: bold;
+    color: #27ae60;
+  }
+  
+  div > p:nth-child(odd) {
+    color: #e74c3c;
+  }
+  
+  /* Loading Message */
+  p {
+    font-style: italic;
+    color: #7f8c8d;
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  /* Add Spacing between Sections */
+  div > div {
+    margin-bottom: 30px;
+  }
+  
+  /* Style for Different Market Data Sections */
+  div > div:nth-child(odd) {
+    background-color: #ecf0f1;
+    padding: 15px;
+    border-radius: 8px;
+  }
+  
+  div > div:nth-child(even) {
+    background-color: #f9fafb;
+    padding: 15px;
+    border-radius: 8px;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    div {
+      width: 95%;
+    }
+  
+    h1 {
+      font-size: 1.8rem;
+    }
+  
+    h2 {
+      font-size: 1.4rem;
+    }
+  
+    p {
+      font-size: 1rem;
+    }
+  }
+  

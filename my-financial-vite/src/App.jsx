@@ -9,6 +9,7 @@ import Login from './components/Login/Login';
 import Register from './components/Register/Register';
 import Planning from './components/Planning/Planning';
 import RegisterForm from './components/RegisterForm/RegisterForm';
+import GenAI from './components/GenAI/GenAI';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path="/planning" element={<Planning />} />
         <Route path="/retirement" element={<Retirement />} />
         <Route path="/registerform" element={<RegisterForm />}/>
+        <Route path="/recipe" element={<GenAI />}/>
       </Routes>
     </div>
   )
