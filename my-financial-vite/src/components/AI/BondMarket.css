@@ -1,0 +1,39 @@
+/* BondMarket.css */
+
+/* Styling for the overall container */
+.bond-container {
+    display: flex; /* Use flexbox for a horizontal layout */
+    justify-content: space-between; /* Distribute space between cards */
+    gap: 20px; /* Add space between the bond cards */
+    flex-wrap: wrap; /* Allow cards to wrap to the next line if needed */
+    padding: 20px; /* Add padding around the container */
+  }
+  
+  /* Styling for each bond card */
+  .bond-card {
+    background-color: #f4f4f9; /* Light background color for the card */
+    border: 1px solid #ddd; /* Light border for the card */
+    padding: 20px; /* Padding inside each card */
+    width: 30%; /* Each card takes up 30% of the container width */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow around cards */
+    border-radius: 8px; /* Rounded corners for the cards */
+    text-align: center; /* Center text inside the cards */
+    transition: transform 0.3s ease; /* Smooth scale transition */
+  }
+  
+  .bond-card:hover {
+    transform: scale(1.05); /* Slightly enlarge the card on hover */
+  }
+  
+  /* Styling for the card heading */
+  .bond-card h2 {
+    font-size: 1.5rem;
+    color: #333; /* Darker color for the heading */
+  }
+  
+  /* Styling for the bond details */
+  .bond-card p {
+    font-size: 1rem;
+    color: #666; /* Lighter color for the text */
+  }
+  
