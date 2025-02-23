@@ -1,13 +1,12 @@
 import React from 'react';
 import './Login.css';
-import { Box, Button, Container, TextField, Typography } from '@mui/material';
+import { Box, Container, TextField, Typography } from '@mui/material';
 import { useSignInWithEmailAndPassword, useSignInWithGoogle } from "react-firebase-hooks/auth";
 import { auth } from "../../../common/firebase";
 import { useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../Navbar/Navbar';
-
-
+import GoogleLogo from '../../images/google-logo.png';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -29,26 +28,27 @@ const Login = () => {
         }, [user, navigate, gUser]);
 
     return (
-        <div>
+        <div className="login">
             <Navbar />
-            <Container maxWidth="xs">
-                <Box sx={{marginTop: 8, display: 'flex', justifyContent: 'center', alignItems: 'center',flexDirection:'column'}}>
+            <div className="login-container">
+                <Container maxWidth="xs">
                     <Typography component="h1" variant="h5" color="common.black">
                         Login
                     </Typography>
 
                     <Box component="form" noValidate sx={{ mt: 1}} onSubmit={handleSubmit}>
-                        <TextField margin="normal" fullWidth name="email" label="Email Address"/>
-                        <TextField margin="normal" fullWidth name="password" label="Password"/>
-                        <Button type="submit" fullWidth variant='contained' sx={{mt: 3 ,mb: 2}}>
-                            Login
-                        </Button>
-                        <Button type="submit" fullWidth variant='outlined' sx={{mt:3, mb:2}}  onClick={() => signInWithGoogle()}>
-                            Login with Google
-                        </Button>
+                        <div className="login-form">
+                            <TextField className="email" name="email" label="Email Address"/>
+                            <TextField className="password" name="password" label="Password"/>
+                            <button className="submit-btn" type="submit">Login</button>
+                            <button className="google-btn" type="submit" onClick={() => signInWithGoogle()}>
+                                <img src={GoogleLogo} alt="Google Logo" className="google-logo"/>
+                                Login with Google
+                            </button>
+                        </div>
                     </Box>
-                </Box>
-            </Container>
+                </Container>
+            </div>
         </div>
     )
 }
