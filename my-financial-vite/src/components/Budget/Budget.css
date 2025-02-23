@@ -1,15 +1,87 @@
+/* Budget.css */
+
+/* General styles */
 .budget {
     display: flex;
     flex-direction: row;
     background-color: #f0f0f0;
+    justify-content: center;
+    height: 100%;
 }
 
-.content.expand {
+.budget h1 {
+    color: black;
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin-top: 50px;
+}
+
+.full-content {
+    display: flex;
+    flex-direction: column;
+    margin-top: 30px;
+    margin-left: 30px;
+}
+
+.budget .content.expand {
     margin-left: 300px;
+    flex-direction: column;
+    height: 100vh;
+  }
+  
+  .content {
+    margin-left: 240px; /* Adjust based on sidebar width */
     transition: margin-left 0.3s ease;
-}
-
-.content.collapse {
-    margin-left: 140px;
+  }
+  
+  .content.collapse {
+    margin-left: 140px; /* Updated margin for collapsed sidebar */
     transition: margin-left 0.3s ease;
-}
+  }
+  
+  /* Card styles */
+  .card-content {
+    padding: 16px;
+  }
+  
+  /* Expense list styles */
+  .expense-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+  }
+  
+  .expense-item:hover {
+    background-color: rgba(0, 0, 0, 0.04); /* Equivalent to 'action.hover' in MUI */
+  }
+  
+  .expense-actions {
+    display: flex;
+    align-items: center;
+  }
+  
+  /* Dialog styles */
+  .dialog-content {
+    padding: 16px;
+  }
+  
+  /* Snackbar styles */
+  .snackbar-alert {
+    width: 100%;
+  }
+  
+  /* Loading and error styles */
+  .loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  .error-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
