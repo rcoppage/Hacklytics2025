@@ -116,7 +116,7 @@ function Budget() {
         return;
       }
 
-      const response = await fetch('http://localhost:5000/update-budget', {
+      const response = await fetch('http://localhost:3001/update-budget', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -161,7 +161,7 @@ function Budget() {
         return;
       }
 
-      const response = await fetch(`http://localhost:5000/get-financial-data/${user.uid}`);
+      const response = await fetch(`http://localhost:3001/get-financial-data/${user.uid}`);
       const data = await response.json();
 
       if (data.success && data.data) {
