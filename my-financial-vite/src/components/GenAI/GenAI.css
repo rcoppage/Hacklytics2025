@@ -14,3 +14,23 @@
     flex-direction: column;
     align-items: center;
 }
+
+.genAI {
+    background-color: rgb(230, 228, 228);
+    min-height: 100vh;
+    height: 100%;
+}
+
+.bold {
+    font-weight: bold;
+    font-weight: 12px;
+}
+
+.italic {
+    font-style: italic;
+    font-weight: 15px;
+
+}
+.underline{
+    font-style: underline;
+}   
